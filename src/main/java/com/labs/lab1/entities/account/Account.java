@@ -2,14 +2,11 @@ package com.labs.lab1.entities.account;
 
 import com.labs.lab1.services.Replenishable;
 import com.labs.lab1.services.Transferable;
-import com.labs.lab1.services.Updatable;
 import com.labs.lab1.services.Withdrowable;
 import com.labs.lab1.valueObjects.AccountState;
-import com.labs.lab1.valueObjects.AccountType;
-import exceptions.NegativeBalanceException;
+import exceptions.NotEnoughMoneyException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
@@ -28,15 +25,15 @@ public abstract class Account implements Replenishable, Withdrowable, Transferab
     }
 
     @Override
-    public void transfer(Account anotherAccount, double amount) throws NegativeBalanceException {
-        if (balance < amount) throw new NegativeBalanceException("Transaction cannot be done");
+    public void transfer(Account anotherAccount, double amount) throws NotEnoughMoneyException {
+        if (balance < amount) throw new NotEnoughMoneyException("Transaction cannot be done");
         balance -= amount;
         anotherAccount.balance += amount;
     }
 
     @Override
-    public void withdraw(double amount) throws NegativeBalanceException {
-        if (balance < amount) throw new NegativeBalanceException("Transaction cannot be done");
+    public void withdraw(double amount) throws NotEnoughMoneyException {
+        if (balance < amount) throw new NotEnoughMoneyException("Transaction cannot be done");
         balance -= amount;
     }
 }

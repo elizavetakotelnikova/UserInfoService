@@ -1,7 +1,7 @@
 package com.labs.lab1.services;
 
-import exceptions.NegativeBalanceException;
+import exceptions.NotEnoughMoneyException;
 
 public interface Withdrowable {
-    public void withdraw(double amount) throws NegativeBalanceException;
+    public void withdraw(double amount) throws NotEnoughMoneyException;
 }

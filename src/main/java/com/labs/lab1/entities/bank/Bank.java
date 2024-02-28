@@ -32,15 +32,28 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
     private List<Updatable> accounts = new ArrayList<>();
     private double checkingAccountPercentage;
     private double baseCommission;
+    private double loanRate;
 
     public Bank(String name, List<Customer> customers, List<SavingsAccountsConditions> savingsAccountsConditions,
-                List<Updatable> accounts, double checkingAccountPercentage, double baseCommission) {
+                List<Updatable> accounts, double checkingAccountPercentage, double baseCommission, double loanRate) {
+        this.id = UUID.randomUUID();
         this.name = name;
         this.customers = customers;
         this.savingsAccountsConditions = savingsAccountsConditions;
         this.accounts = accounts;
         this.checkingAccountPercentage = checkingAccountPercentage;
         this.baseCommission = baseCommission;
+        this.loanRate = loanRate;
+    }
+
+    public Bank(String name, List<SavingsAccountsConditions> savingsAccountsConditions,
+                double checkingAccountPercentage, double baseCommission, double loanRate) {
+        this.id = UUID.randomUUID();
+        this.name = name;
+        this.savingsAccountsConditions = savingsAccountsConditions;
+        this.checkingAccountPercentage = checkingAccountPercentage;
+        this.baseCommission = baseCommission;
+        this.loanRate = loanRate;
     }
 
     @Override
@@ -64,8 +77,9 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
         return new CreditAccount(UUID.randomUUID(), customer.getId(), id, 0,
                 AccountState.NotVerified,
                 baseCommission,
-                info.getLimit()
-                );
+                info.getLimit(),
+                loanRate
+                 );
     }
     public Account createCheckingAccount(Customer customer, CreateAccountDTO info) {
         return new CheckingAccount(UUID.randomUUID(), customer.getId(), id, 0,
