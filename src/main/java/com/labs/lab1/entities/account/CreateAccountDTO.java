@@ -1,4 +1,4 @@
-package com.labs.lab1.models;
+package com.labs.lab1.entities.account;
 
 import com.labs.lab1.valueObjects.AccountType;
 import lombok.AllArgsConstructor;

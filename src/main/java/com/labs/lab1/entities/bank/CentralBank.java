@@ -14,7 +14,8 @@ public class CentralBank implements BankCreatable {
         if (info.getName().isEmpty())
             throw new IncorrectArgumentsException("Invalid information for bank creating");
         var createdBank = new Bank(info.getName(), info.getSavingsAccountsConditions(),
-                info.getCheckingAccountPercentage(), info.getBaseCommission(), info.getLoanRate());
+                info.getCheckingAccountPercentage(), info.getBaseCommission(), info.getLoanRate(),
+                info.getNotVerifiedLimit());
         banks.add(createdBank);
         return createdBank;
 

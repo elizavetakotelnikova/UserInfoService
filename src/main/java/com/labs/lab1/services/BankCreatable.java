@@ -5,5 +5,5 @@ import com.labs.lab1.entities.bank.CreateBankDTO;
 import exceptions.IncorrectArgumentsException;
 
 public interface BankCreatable {
-    public Bank createBank(CreateBankDTO bankInfo) throws IncorrectArgumentsException;
+    Bank createBank(CreateBankDTO bankInfo) throws IncorrectArgumentsException;
 }

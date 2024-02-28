@@ -6,54 +6,61 @@ import com.labs.lab1.entities.account.CreditAccount;
 import com.labs.lab1.entities.account.SavingsAccount;
 import com.labs.lab1.entities.customer.Customer;
 import com.labs.lab1.models.Address;
-import com.labs.lab1.models.CreateAccountDTO;
+import com.labs.lab1.entities.account.CreateAccountDTO;
 import com.labs.lab1.models.PassportData;
 import com.labs.lab1.models.SavingsAccountsConditions;
-import com.labs.lab1.services.AccountCreatable;
-import com.labs.lab1.services.CustomerCreatable;
-import com.labs.lab1.services.PercentageCreditable;
-import com.labs.lab1.services.Updatable;
+import com.labs.lab1.services.*;
 import com.labs.lab1.valueObjects.AccountState;
 import com.labs.lab1.valueObjects.AccountType;
 import exceptions.IncorrectArgumentsException;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Builder
+@Getter
 @AllArgsConstructor
 public class Bank implements CustomerCreatable, AccountCreatable, PercentageCreditable {
     private UUID id;
+    @Setter
     private String name;
     private List<Customer> customers = new ArrayList<>();
-    private List<SavingsAccountsConditions> savingsAccountsConditions = new ArrayList<>();
-    private List<Updatable> accounts = new ArrayList<>();
+    private List<Account> accounts = new ArrayList<>();
+    private List<SavingsAccountsConditions> savingsAccountsConditions;
     private double checkingAccountPercentage;
-    private double baseCommission;
+    private double baseCreditCommission;
     private double loanRate;
+    private double notVerifiedLimit;
 
-    public Bank(String name, List<Customer> customers, List<SavingsAccountsConditions> savingsAccountsConditions,
-                List<Updatable> accounts, double checkingAccountPercentage, double baseCommission, double loanRate) {
+    /*public Bank(String name, List<Customer> customers, List<SavingsAccountsConditions> savingsAccountsConditions,
+                List<Account> accounts, double checkingAccountPercentage, double baseCreditCommission, double loanRate,
+                double notVerifiedLimit) {
         this.id = UUID.randomUUID();
         this.name = name;
         this.customers = customers;
         this.savingsAccountsConditions = savingsAccountsConditions;
         this.accounts = accounts;
         this.checkingAccountPercentage = checkingAccountPercentage;
-        this.baseCommission = baseCommission;
+        this.baseCreditCommission = baseCreditCommission;
         this.loanRate = loanRate;
-    }
+        this.notVerifiedLimit = notVerifiedLimit;
+    }*/
 
     public Bank(String name, List<SavingsAccountsConditions> savingsAccountsConditions,
-                double checkingAccountPercentage, double baseCommission, double loanRate) {
+                double checkingAccountPercentage, double baseCreditCommission, double loanRate, double notVerifiedLimit) {
         this.id = UUID.randomUUID();
         this.name = name;
         this.savingsAccountsConditions = savingsAccountsConditions;
         this.checkingAccountPercentage = checkingAccountPercentage;
-        this.baseCommission = baseCommission;
+        this.baseCreditCommission = baseCreditCommission;
         this.loanRate = loanRate;
+        this.notVerifiedLimit = notVerifiedLimit;
     }
 
     @Override
@@ -74,25 +81,27 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
        return createdAccount;
     }
     public Account createCreditAccount(Customer customer, CreateAccountDTO info) {
-        return new CreditAccount(UUID.randomUUID(), customer.getId(), id, 0,
+        return new CreditAccount(customer.getId(), id, 0, notVerifiedLimit,
                 AccountState.NotVerified,
-                baseCommission,
+                baseCreditCommission,
                 info.getLimit(),
                 loanRate
                  );
     }
     public Account createCheckingAccount(Customer customer, CreateAccountDTO info) {
-        return new CheckingAccount(UUID.randomUUID(), customer.getId(), id, 0,
-                AccountState.NotVerified,
-                checkingAccountPercentage
-        );
+        return new CheckingAccount(customer.getId(), id, 0,
+                notVerifiedLimit,  AccountState.NotVerified, checkingAccountPercentage);
+    }
+    public SavingsAccountsConditions findConditions(double amount) {
+        SavingsAccountsConditions foundPercentage = savingsAccountsConditions.stream().filter(
+                conditions -> amount >= conditions.getStartAmount() && amount <=conditions.getEndAmount()
+        ).findAny().get();
+        return foundPercentage;
     }
     public Account createSavingsAccount(Customer customer, CreateAccountDTO info) {
         //есть максимальная сумма вклада
-        SavingsAccountsConditions foundPercentage = savingsAccountsConditions.stream().filter(
-                conditions -> info.getAmount() >= conditions.getStartAmount() && info.getAmount() <=conditions.getEndAmount()
-        ).findAny().get();
-        return new SavingsAccount(UUID.randomUUID(), customer.getId(), id, info.getAmount() ,
+        var foundPercentage = findConditions(info.getAmount());
+        return new SavingsAccount(customer.getId(), id, info.getAmount(), notVerifiedLimit,
                 AccountState.NotVerified,
                 LocalDate.now().plusMonths(info.getMonthsQuantity()),
                 foundPercentage.getPercentage());
@@ -100,6 +109,38 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
 
     @Override
     public void updateAccount() {
-        accounts.forEach(Updatable::makeRegularUpdate);
+        accounts.stream().filter(x -> x instanceof Updatable).forEach(x -> ((Updatable) x).makeRegularUpdate());
+    }
+
+    public void changeBaseCommission(double updatedCommission) {
+        baseCreditCommission = updatedCommission;
+        for (Account account : accounts) {
+            if (account instanceof CreditAccount) {
+                ((CreditAccount) (account)).setCommissionRate(baseCreditCommission);
+                var customer = customers.stream().filter(x -> x.getId().equals(account.getUserId())).findAny().get();
+                customer.getNotification("New commission set by bank");
+            }
+        }
+    }
+    public void changeSavingsPercentageCommission(List<SavingsAccountsConditions> updatedSavingsAccountConditions) {
+        //проценты по депозитам не меняются до срока истечения договора
+        savingsAccountsConditions = updatedSavingsAccountConditions;
+        for (Account account : accounts) {
+            if (account instanceof SavingsAccount) {
+                //((SavingsAccount) (account)).setPercentage(findConditions(account.getBalance()).getPercentage());
+                var customer = customers.stream().filter(x -> x.getId().equals(account.getUserId())).findAny().get();
+                customer.getNotification("New conditions offered by bank, see updated conditions");
+            }
+        }
+    }
+    public void changeCheckingAccountsPercentage(double updatedCheckingAccountPercentage) {
+        checkingAccountPercentage = updatedCheckingAccountPercentage;
+        for (Account account : accounts) {
+            if (account instanceof CheckingAccount) {
+                ((CheckingAccount) (account)).setPercentage(updatedCheckingAccountPercentage);
+                var customer = customers.stream().filter(x -> x.getId().equals(account.getUserId())).findAny().get();
+                customer.getNotification("New balance percentage set by bank");
+            }
+        }
     }
 }

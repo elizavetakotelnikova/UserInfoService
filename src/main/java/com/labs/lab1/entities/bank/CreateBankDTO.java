@@ -1,11 +1,6 @@
 package com.labs.lab1.entities.bank;
-
-import com.labs.lab1.entities.customer.Customer;
 import com.labs.lab1.models.SavingsAccountsConditions;
-import com.labs.lab1.services.Updatable;
 import lombok.Data;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,4 +12,5 @@ public class CreateBankDTO {
     private double checkingAccountPercentage;
     private double baseCommission;
     private double loanRate;
+    private double notVerifiedLimit;
 }
