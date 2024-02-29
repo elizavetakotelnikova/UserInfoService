@@ -32,25 +32,11 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
     private List<Customer> customers = new ArrayList<>();
     private List<Account> accounts = new ArrayList<>();
     private List<RangeConditionsInfo> savingsAccountsConditions;
+    private List<Command> transactions;
     private double checkingAccountPercentage;
     private double baseCreditCommission;
     private double loanRate;
     private double notVerifiedLimit;
-    private List<Command> transactions;
-
-    /*public Bank(String name, List<Customer> customers, List<SavingsAccountsConditions> savingsAccountsConditions,
-                List<Account> accounts, double checkingAccountPercentage, double baseCreditCommission, double loanRate,
-                double notVerifiedLimit) {
-        this.id = UUID.randomUUID();
-        this.name = name;
-        this.customers = customers;
-        this.savingsAccountsConditions = savingsAccountsConditions;
-        this.accounts = accounts;
-        this.checkingAccountPercentage = checkingAccountPercentage;
-        this.baseCreditCommission = baseCreditCommission;
-        this.loanRate = loanRate;
-        this.notVerifiedLimit = notVerifiedLimit;
-    }*/
 
     public Bank(String name, List<RangeConditionsInfo> savingsAccountsConditions,
                 double checkingAccountPercentage, double baseCreditCommission, double loanRate, double notVerifiedLimit) {
@@ -66,8 +52,9 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
     @Override
     public Customer createCustomer(Address address, PassportData passportData, String  firstName, String lastName) throws IncorrectArgumentsException {
         if (!firstName.isEmpty() && !lastName.isEmpty()) throw new IncorrectArgumentsException("Required fields are not set");
-        return new Customer(firstName, lastName, address, passportData);
-
+        var createdCustomer = new Customer(firstName, lastName, address, passportData);
+        customers.add(createdCustomer);
+        return createdCustomer;
     }
     @Override
     public Account createAccount(Customer customer, CreateAccountDTO info) {
@@ -78,6 +65,7 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
         if (createdAccount != null && customer.getAddress() != null && customer.getPassportData() != null) {
             createdAccount.setState(AccountState.Verified);
         }
+        accounts.add(createdAccount);
        return createdAccount;
     }
     public Account createCreditAccount(Customer customer, CreateAccountDTO info) {
