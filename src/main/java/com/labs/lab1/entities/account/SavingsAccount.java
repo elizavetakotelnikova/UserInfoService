@@ -2,7 +2,6 @@ package com.labs.lab1.entities.account;
 
 import com.labs.lab1.services.Updatable;
 import com.labs.lab1.valueObjects.AccountState;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,7 +19,8 @@ public class SavingsAccount extends Account implements Updatable {
     }
     public SavingsAccount(UUID id, UUID userId, UUID bankId, double balance, double notVerifiedLimit, AccountState state,
                           LocalDate endDate, double percentage) {
-        super(id, userId, bankId, balance, notVerifiedLimit, state);
+        super(userId, bankId, balance, notVerifiedLimit, state);
+        this.id = id;
         this.endDate = endDate;
         this.percentage = percentage;
     }

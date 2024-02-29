@@ -2,7 +2,6 @@ package com.labs.lab1.entities.account;
 
 import com.labs.lab1.services.Updatable;
 import com.labs.lab1.valueObjects.AccountState;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +17,8 @@ public class CheckingAccount extends Account implements Updatable {
     private double percentage;
 
     public CheckingAccount (UUID id, UUID userId, UUID bankId, double balance, double notVerifiedLimit, AccountState state, double percentage) {
-        super(id, userId, bankId, balance, notVerifiedLimit, state);
+        super(userId, bankId, balance, notVerifiedLimit, state);
+        this.id = id;
         this.percentage = percentage;
     }
 

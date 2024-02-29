@@ -2,7 +2,6 @@ package com.labs.lab1.entities.account;
 
 import com.labs.lab1.services.Updatable;
 import com.labs.lab1.valueObjects.AccountState;
-import exceptions.FailedTransactionException;
 import exceptions.NotEnoughMoneyException;
 import exceptions.NotVerifiedException;
 import lombok.Getter;
@@ -22,7 +21,8 @@ public class CreditAccount extends Account implements Updatable {
         this.loanRate = loanRate;
     }
     public CreditAccount(UUID id, UUID userId, UUID bankId, double balance, double notVerifiedLimit, AccountState state, double commissionRate, double limit, double loanRate) {
-        super(id, userId, bankId, balance, notVerifiedLimit, state);
+        super(userId, bankId, balance, notVerifiedLimit, state);
+        this.id = id;
         this.commissionRate = commissionRate;
         this.limit = limit;
         this.loanRate = loanRate;
@@ -48,11 +48,6 @@ public class CreditAccount extends Account implements Updatable {
             balance -= amount;
             balance -= commissionRate;
         }
-    }
-    @Override
-    public void transfer(Account anotherAccount, double amount) throws NotEnoughMoneyException, NotVerifiedException {
-        withdraw(amount);
-        replenish(amount);
     }
 
     @Override

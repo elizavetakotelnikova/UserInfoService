@@ -5,10 +5,9 @@ import com.labs.lab1.entities.account.CheckingAccount;
 import com.labs.lab1.entities.account.CreditAccount;
 import com.labs.lab1.entities.account.SavingsAccount;
 import com.labs.lab1.entities.customer.Customer;
-import com.labs.lab1.models.Address;
+import com.labs.lab1.entities.transaction.Command;
+import com.labs.lab1.models.*;
 import com.labs.lab1.entities.account.CreateAccountDTO;
-import com.labs.lab1.models.PassportData;
-import com.labs.lab1.models.SavingsAccountsConditions;
 import com.labs.lab1.services.*;
 import com.labs.lab1.valueObjects.AccountState;
 import com.labs.lab1.valueObjects.AccountType;
@@ -32,11 +31,12 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
     private String name;
     private List<Customer> customers = new ArrayList<>();
     private List<Account> accounts = new ArrayList<>();
-    private List<SavingsAccountsConditions> savingsAccountsConditions;
+    private List<RangeConditionsInfo> savingsAccountsConditions;
     private double checkingAccountPercentage;
     private double baseCreditCommission;
     private double loanRate;
     private double notVerifiedLimit;
+    private List<Command> transactions;
 
     /*public Bank(String name, List<Customer> customers, List<SavingsAccountsConditions> savingsAccountsConditions,
                 List<Account> accounts, double checkingAccountPercentage, double baseCreditCommission, double loanRate,
@@ -52,7 +52,7 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
         this.notVerifiedLimit = notVerifiedLimit;
     }*/
 
-    public Bank(String name, List<SavingsAccountsConditions> savingsAccountsConditions,
+    public Bank(String name, List<RangeConditionsInfo> savingsAccountsConditions,
                 double checkingAccountPercentage, double baseCreditCommission, double loanRate, double notVerifiedLimit) {
         this.id = UUID.randomUUID();
         this.name = name;
@@ -92,9 +92,9 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
         return new CheckingAccount(customer.getId(), id, 0,
                 notVerifiedLimit,  AccountState.NotVerified, checkingAccountPercentage);
     }
-    public SavingsAccountsConditions findConditions(double amount) {
-        SavingsAccountsConditions foundPercentage = savingsAccountsConditions.stream().filter(
-                conditions -> amount >= conditions.getStartAmount() && amount <=conditions.getEndAmount()
+    public RangeConditionsInfo findConditions(double amount) {
+        RangeConditionsInfo foundPercentage = savingsAccountsConditions.stream().filter(
+                conditions -> amount >= conditions.getStartAmount() && amount <= conditions.getEndAmount()
         ).findAny().get();
         return foundPercentage;
     }
@@ -122,7 +122,7 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
             }
         }
     }
-    public void changeSavingsPercentageCommission(List<SavingsAccountsConditions> updatedSavingsAccountConditions) {
+    public void changeSavingsPercentageCommission(List<RangeConditionsInfo> updatedSavingsAccountConditions) {
         //проценты по депозитам не меняются до срока истечения договора
         savingsAccountsConditions = updatedSavingsAccountConditions;
         for (Account account : accounts) {
@@ -141,6 +141,16 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
                 var customer = customers.stream().filter(x -> x.getId().equals(account.getUserId())).findAny().get();
                 customer.getNotification("New balance percentage set by bank");
             }
+        }
+    }
+    public void rollbackTransaction(UUID id) {
+        for (Account account : accounts) {
+            try {
+                account.getTransactionsHistory().stream().filter(x -> x.getId() == id).findAny().get().undo();
+            }
+            catch (Exception e) {
+                continue;
+            };
         }
     }
 }
