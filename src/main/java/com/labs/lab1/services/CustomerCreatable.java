@@ -6,5 +6,5 @@ import com.labs.lab1.models.PassportData;
 import exceptions.IncorrectArgumentsException;
 
 public interface CustomerCreatable {
-    public Customer createCustomer(Address address, PassportData passportData, String  firstName, String lastName) throws IncorrectArgumentsException;
+    Customer createCustomer(Address address, PassportData passportData, String  firstName, String lastName) throws IncorrectArgumentsException;
 }
