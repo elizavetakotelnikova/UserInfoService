@@ -16,16 +16,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Builder
 @Getter
 @AllArgsConstructor
-public class Bank implements CustomerCreatable, AccountCreatable, PercentageCreditable {
+public class Bank implements CustomerCreatable, AccountCreatable, PercentageCreditable, Observable {
     private UUID id;
     @Setter
     private String name;
@@ -33,6 +31,7 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
     private List<Account> accounts = new ArrayList<>();
     private List<RangeConditionsInfo> savingsAccountsConditions;
     private List<Command> transactions;
+    private List<NotificationGetable> subscribers;
     private double checkingAccountPercentage;
     private double baseCreditCommission;
     private double loanRate;
@@ -48,6 +47,20 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
         this.loanRate = loanRate;
         this.notVerifiedLimit = notVerifiedLimit;
     }
+    @Override
+    public void RegisterObserver(NotificationGetable subscriber) {
+        subscribers.add(subscriber);
+    }
+
+    @Override
+    public void RemoveObserver(NotificationGetable subscriber) {
+        subscribers.remove(subscriber);
+    }
+
+    @Override
+    public void NotifyObservers(String message) {
+        subscribers.forEach(x -> x.getNotification(message));
+    }
 
     @Override
     public Customer createCustomer(Address address, PassportData passportData, String  firstName, String lastName) throws IncorrectArgumentsException {
@@ -56,29 +69,28 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
         customers.add(createdCustomer);
         return createdCustomer;
     }
-    @Override
-    public Account createAccount(Customer customer, CreateAccountDTO info) {
-        Account createdAccount = null;
-        if (info.getType() == AccountType.SavingsAccount) createdAccount = createSavingsAccount(customer, info);
-        if (info.getType() == AccountType.CheckingAccount) createdAccount = createCheckingAccount(customer, info);
-        if (info.getType() == AccountType.CreditAccount) createdAccount = createCreditAccount(customer, info);
-        if (createdAccount != null && customer.getAddress() != null && customer.getPassportData() != null) {
+    public Account createCreditAccount(Customer customer, double limit) throws IncorrectArgumentsException {
+        if (limit == 0) throw new IncorrectArgumentsException("Not enough information");
+        var createdAccount = new CreditAccount(customer.getId(), id, 0, notVerifiedLimit,
+                AccountState.NotVerified,
+                baseCreditCommission,
+                limit,
+                loanRate
+        );
+        if (customer.getAddress() != null && customer.getPassportData() != null) {
             createdAccount.setState(AccountState.Verified);
         }
         accounts.add(createdAccount);
-       return createdAccount;
+        return createdAccount;
     }
-    public Account createCreditAccount(Customer customer, CreateAccountDTO info) {
-        return new CreditAccount(customer.getId(), id, 0, notVerifiedLimit,
-                AccountState.NotVerified,
-                baseCreditCommission,
-                info.getLimit(),
-                loanRate
-                 );
-    }
-    public Account createCheckingAccount(Customer customer, CreateAccountDTO info) {
-        return new CheckingAccount(customer.getId(), id, 0,
+    public Account createCheckingAccount(Customer customer) {
+        var createdAccount = new CheckingAccount(customer.getId(), id, 0,
                 notVerifiedLimit,  AccountState.NotVerified, checkingAccountPercentage);
+        if (customer.getAddress() != null && customer.getPassportData() != null) {
+            createdAccount.setState(AccountState.Verified);
+        }
+        accounts.add(createdAccount);
+        return createdAccount;
     }
     public RangeConditionsInfo findConditions(double amount) {
         RangeConditionsInfo foundPercentage = savingsAccountsConditions.stream().filter(
@@ -86,13 +98,30 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
         ).findAny().get();
         return foundPercentage;
     }
-    public Account createSavingsAccount(Customer customer, CreateAccountDTO info) {
+    public Account createSavingsAccount(Customer customer, double amount, int monthsQuantity) throws IncorrectArgumentsException {
         //есть максимальная сумма вклада
-        var foundPercentage = findConditions(info.getAmount());
-        return new SavingsAccount(customer.getId(), id, info.getAmount(), notVerifiedLimit,
+        if (monthsQuantity == 0 || amount == 0) throw new IncorrectArgumentsException("Incorrect data, cannot create account");
+        var foundPercentage = findConditions(amount);
+        var createdAccount = new SavingsAccount(customer.getId(), id, amount, notVerifiedLimit,
                 AccountState.NotVerified,
-                LocalDate.now().plusMonths(info.getMonthsQuantity()),
+                LocalDate.now().plusMonths(monthsQuantity),
                 foundPercentage.getPercentage());
+        if (customer.getAddress() != null && customer.getPassportData() != null) {
+            createdAccount.setState(AccountState.Verified);
+        }
+        accounts.add(createdAccount);
+        return createdAccount;
+    }
+    @Override
+    public Account createAccount(Customer customer, CreateAccountDTO info) throws IncorrectArgumentsException {
+        Account createdAccount = null;
+        if (info.getType() == AccountType.SavingsAccount) createdAccount = createSavingsAccount(customer, info.getAmount(), info.getMonthsQuantity());
+        if (info.getType() == AccountType.CheckingAccount) createdAccount = createCheckingAccount(customer);
+        if (info.getType() == AccountType.CreditAccount) createdAccount = createCreditAccount(customer, info.getLimit());
+        if (createdAccount != null && customer.getAddress() != null && customer.getPassportData() != null) {
+            createdAccount.setState(AccountState.Verified);
+        }
+       return createdAccount;
     }
 
     @Override
@@ -106,7 +135,7 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
             if (account instanceof CreditAccount) {
                 ((CreditAccount) (account)).setCommissionRate(baseCreditCommission);
                 var customer = customers.stream().filter(x -> x.getId().equals(account.getUserId())).findAny().get();
-                customer.getNotification("New commission set by bank");
+                if (subscribers.contains(customer)) customer.getNotification("New commission set by bank");
             }
         }
     }
@@ -117,7 +146,7 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
             if (account instanceof SavingsAccount) {
                 //((SavingsAccount) (account)).setPercentage(findConditions(account.getBalance()).getPercentage());
                 var customer = customers.stream().filter(x -> x.getId().equals(account.getUserId())).findAny().get();
-                customer.getNotification("New conditions offered by bank, see updated conditions");
+                if (subscribers.contains(customer)) customer.getNotification("New conditions offered by bank, see updated conditions");
             }
         }
     }
@@ -127,7 +156,7 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
             if (account instanceof CheckingAccount) {
                 ((CheckingAccount) (account)).setPercentage(updatedCheckingAccountPercentage);
                 var customer = customers.stream().filter(x -> x.getId().equals(account.getUserId())).findAny().get();
-                customer.getNotification("New balance percentage set by bank");
+                if (subscribers.contains(customer)) customer.getNotification("New balance percentage set by bank");
             }
         }
     }

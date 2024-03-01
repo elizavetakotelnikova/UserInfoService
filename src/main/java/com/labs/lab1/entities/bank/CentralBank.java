@@ -3,12 +3,13 @@ package com.labs.lab1.entities.bank;
 import com.labs.lab1.services.BankCreatable;
 import exceptions.IncorrectArgumentsException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class CentralBank implements BankCreatable {
     private static CentralBank instance;
-    public List<Bank> banks;
+    public List<Bank> banks = new ArrayList<>();
     public static CentralBank getInstance() {
         if (instance == null) {
             instance = new CentralBank();
@@ -28,5 +29,8 @@ public class CentralBank implements BankCreatable {
     public double checkTransferConditions(UUID firstBank, UUID secondBank) {
         return 0.01;
         // should consist of conditions based on banks
+    }
+    public void NotifyBanks() {
+        banks.forEach(Bank::updateAccount);
     }
 }
