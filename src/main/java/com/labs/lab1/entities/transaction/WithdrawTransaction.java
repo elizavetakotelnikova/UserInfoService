@@ -1,10 +1,7 @@
 package com.labs.lab1.entities.transaction;
 
 import com.labs.lab1.entities.account.Account;
-import com.labs.lab1.entities.transaction.Command;
 import com.labs.lab1.valueObjects.TransactionState;
-import exceptions.NotEnoughMoneyException;
-import exceptions.NotVerifiedException;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -13,7 +10,7 @@ public class WithdrawTransaction extends Transaction {
     @Getter
     private final Account account;
     private final double backUpAccountBalance;
-    private double withdrawedAmount;
+    private double withdrewAmount;
     @Getter
     private final double amount;
     public WithdrawTransaction(Account account, double amount) {
@@ -36,12 +33,12 @@ public class WithdrawTransaction extends Transaction {
         state = TransactionState.Commit;
     }
     public void backUp() {
-        withdrawedAmount = backUpAccountBalance - account.getBalance();
+        withdrewAmount = backUpAccountBalance - account.getBalance();
     }
     @Override
     public void undo() {
         if (state == TransactionState.Rollback) return;
-        account.setBalance(account.getBalance() + withdrawedAmount);
+        account.setBalance(account.getBalance() + withdrewAmount);
         state = TransactionState.Rollback;
     }
 }

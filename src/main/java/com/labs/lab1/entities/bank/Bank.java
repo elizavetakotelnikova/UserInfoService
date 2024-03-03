@@ -32,7 +32,7 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
     private List<Customer> customers = new ArrayList<>();
     private List<Account> accounts = new ArrayList<>();
     private List<RangeConditionsInfo> savingsAccountsConditions = new ArrayList<>();
-    private List<Command> transactions = new ArrayList<>();
+    private List<Transaction> transactions = new ArrayList<>();
     private List<NotificationGetable> subscribers = new ArrayList<>();
     //BankNotificationCenter bankNotificationCenter = new BankNotificationCenter(this);
     private double checkingAccountPercentage;
@@ -170,10 +170,9 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
      * @return range and percentage for given amount of money
      */
     public RangeConditionsInfo findConditions(double amount) {
-        RangeConditionsInfo foundPercentage = savingsAccountsConditions.stream().filter(
+        return savingsAccountsConditions.stream().filter(
                 conditions -> amount >= conditions.getStartAmount() && amount <= conditions.getEndAmount()
         ).findAny().get();
-        return foundPercentage;
     }
 
     /**
@@ -250,20 +249,14 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
                 throw new NotVerifiedException("Transaction cannot be done, account not verified");
             }
         }
+        transactions.add(transaction);
         transaction.execute();
     }
     /**
      * rollback transaction
-     * @param id transaction id
-     */
-    public void rollbackTransaction(UUID id) {
-        for (Account account : accounts) {
-            try {
-                account.getTransactionsHistory().stream().filter(x -> x.getId() == id).findAny().get().undo();
-            }
-            catch (Exception e) {
-                continue;
-            };
-        }
+     * */
+    public void rollbackTransaction(Transaction transaction) {
+        if (!transactions.contains(transaction)) return;
+        transaction.undo();
     }
 }

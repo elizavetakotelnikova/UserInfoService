@@ -70,7 +70,7 @@ class Lab1ApplicationTests {
             throw new RuntimeException(e);
         }
         testBank.makeTransaction(new WithdrawTransaction(account, 50));
-        testBank.makeTransaction(new WithdrawTransaction(account, 50));
+        testBank.makeTransaction(new WithdrawTransaction(account, 500));
         assert(account.getBalance() == (0 - 50 - 500 - testBank.getBaseCreditCommission()));
     }
 
@@ -85,7 +85,7 @@ class Lab1ApplicationTests {
         var replenish = new ReplenishTransaction(account, 50);
         testBank.makeTransaction(replenish);
         testBank.makeTransaction(new WithdrawTransaction(account, 500));
-        testBank.rollbackTransaction(replenish.getId());
+        testBank.rollbackTransaction(replenish);
         assert(account.getBalance() == (0 - 500 - testBank.getBaseCreditCommission()));
     }
 
@@ -124,7 +124,7 @@ class Lab1ApplicationTests {
             throw new RuntimeException(e);
         }
         Account finalAccount = account;
-        assertThrows(NotVerifiedException.class, () -> finalAccount.withdraw(60000));
+        assertThrows(NotVerifiedException.class, () -> testBank.makeTransaction(new WithdrawTransaction(finalAccount, 60000)));
     }
 
     @Test
