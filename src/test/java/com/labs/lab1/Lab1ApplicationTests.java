@@ -1,23 +1,23 @@
 package com.labs.lab1;
 import com.labs.lab1.entities.account.Account;
-import com.labs.lab1.entities.account.CreateAccountDTO;
 import com.labs.lab1.entities.bank.Bank;
 import com.labs.lab1.entities.bank.CentralBank;
 import com.labs.lab1.entities.bank.CreateBankDTO;
 import com.labs.lab1.entities.customer.Customer;
-import com.labs.lab1.entities.transaction.CreateCheckingAccount;
-import com.labs.lab1.entities.transaction.CreateCreditAccount;
 import com.labs.lab1.entities.transaction.ReplenishTransaction;
 import com.labs.lab1.models.RangeConditionsInfo;
 import com.labs.lab1.services.CommandInvokerImpl;
 import com.labs.lab1.entities.transaction.WithdrawTransaction;
-import com.labs.lab1.valueObjects.AccountType;
+import com.labs.lab1.services.TimeMachineService;
 import com.labs.lab1.valueObjects.TransactionState;
 import exceptions.IncorrectArgumentsException;
+import exceptions.NotVerifiedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class Lab1ApplicationTests {
 
@@ -43,7 +43,7 @@ class Lab1ApplicationTests {
     void withdrawIncorrectAmount() {
         Account account = null;
         try {
-            account = testBank.createAccount(testCustomer, new CreateAccountDTO(5000, 6, AccountType.SavingsAccount, null));
+            account = testBank.createSavingsAccount(testCustomer, 5000, 6);
         } catch (IncorrectArgumentsException e) {
             throw new RuntimeException(e);
         }
@@ -84,6 +84,45 @@ class Lab1ApplicationTests {
         commandInvoker.Consume(new WithdrawTransaction(account, 500));
         testBank.rollbackTransaction(replenish.getId());
         assert(account.getBalance() == (0 - 500 - testBank.getBaseCreditCommission()));
+    }
+
+    @Test
+    void timeServiceTest() {
+        Account account = null;
+        try {
+            account = testBank.createSavingsAccount(testCustomer, 5000, 2);
+        } catch (IncorrectArgumentsException e) {
+            throw new RuntimeException(e);
+        }
+        var timeService = new TimeMachineService();
+        var speededUpAccount = timeService.speedUpTime(account, 2);
+        assert(speededUpAccount.getBalance() == 5618);
+    }
+
+    @Test
+    void creditLimitTest() {
+        Account account = null;
+        try {
+            account = testBank.createCreditAccount(testCustomer, 50000);
+        } catch (IncorrectArgumentsException e) {
+            throw new RuntimeException(e);
+        }
+        var commandInvoker = new CommandInvokerImpl();
+        var transaction = new WithdrawTransaction(account, 1000000);
+        commandInvoker.Consume(transaction);
+        assert(transaction.getState() == TransactionState.Rollback);
+    }
+
+    @Test
+    void notVerifiedExceptionTesting() {
+        Account account = null;
+        try {
+            account = testBank.createCreditAccount(testCustomer, 500000);
+        } catch (IncorrectArgumentsException e) {
+            throw new RuntimeException(e);
+        }
+        Account finalAccount = account;
+        assertThrows(NotVerifiedException.class, () -> finalAccount.withdraw(60000));
     }
 
 }

@@ -25,6 +25,6 @@ public class CheckingAccount extends Account implements Updatable {
 
     @Override
     public void makeRegularUpdate() {
-        this.balance += this.balance * percentage;
+        this.balance += this.balance * (percentage / 100);
     }
 }

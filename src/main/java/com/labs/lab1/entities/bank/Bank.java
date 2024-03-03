@@ -7,13 +7,10 @@ import com.labs.lab1.entities.account.SavingsAccount;
 import com.labs.lab1.entities.customer.Customer;
 import com.labs.lab1.entities.transaction.Command;
 import com.labs.lab1.models.*;
-import com.labs.lab1.entities.account.CreateAccountDTO;
 import com.labs.lab1.services.*;
 import com.labs.lab1.valueObjects.AccountState;
-import com.labs.lab1.valueObjects.AccountType;
 import exceptions.IncorrectArgumentsException;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDate;
@@ -23,7 +20,7 @@ import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-public class Bank implements CustomerCreatable, AccountCreatable, PercentageCreditable, Observable {
+public class Bank implements CustomerCreatable, PercentageCreditable, Observable {
     private UUID id;
     @Setter
     private String name;
@@ -111,17 +108,6 @@ public class Bank implements CustomerCreatable, AccountCreatable, PercentageCred
         }
         accounts.add(createdAccount);
         return createdAccount;
-    }
-    @Override
-    public Account createAccount(Customer customer, CreateAccountDTO info) throws IncorrectArgumentsException {
-        Account createdAccount = null;
-        if (info.getType() == AccountType.SavingsAccount) createdAccount = createSavingsAccount(customer, info.getAmount(), info.getMonthsQuantity());
-        if (info.getType() == AccountType.CheckingAccount) createdAccount = createCheckingAccount(customer);
-        if (info.getType() == AccountType.CreditAccount) createdAccount = createCreditAccount(customer, info.getLimit());
-        if (createdAccount != null && customer.getAddress() != null && customer.getPassportData() != null) {
-            createdAccount.setState(AccountState.Verified);
-        }
-       return createdAccount;
     }
 
     @Override

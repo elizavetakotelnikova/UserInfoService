@@ -29,6 +29,6 @@ public class SavingsAccount extends Account implements Updatable {
 
     @Override
     public void makeRegularUpdate() {
-        if (endDate.isAfter(LocalDate.now())) balance += balance* percentage;
+        if (endDate.isAfter(LocalDate.now())) balance += balance * (percentage / 100);
     }
 }

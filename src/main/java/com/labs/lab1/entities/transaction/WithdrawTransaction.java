@@ -3,6 +3,8 @@ package com.labs.lab1.entities.transaction;
 import com.labs.lab1.entities.account.Account;
 import com.labs.lab1.entities.transaction.Command;
 import com.labs.lab1.valueObjects.TransactionState;
+import exceptions.NotEnoughMoneyException;
+import exceptions.NotVerifiedException;
 import lombok.Getter;
 
 import java.util.UUID;

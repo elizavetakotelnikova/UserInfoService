@@ -52,6 +52,6 @@ public class CreditAccount extends Account implements Updatable {
 
     @Override
     public void makeRegularUpdate() {
-        if (balance < 0) balance -= balance * loanRate;
+        if (balance < 0) balance -= balance * (loanRate / 100);
     }
 }
