@@ -228,23 +228,9 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
      * @param transaction transaction to be done
      * @throws NotVerifiedException if account is not verified and amount is bigger than allowed limit
      */
-    public void makeTransaction(Transaction transaction) throws NotVerifiedException {
-        if (transaction instanceof WithdrawTransaction) {
-            if (((WithdrawTransaction) transaction).getAccount().getState() == AccountState.NotVerified &&
-                    ((WithdrawTransaction) transaction).getAmount() > notVerifiedLimit) {
-                transaction.setState(TransactionState.Rollback);
-                throw new NotVerifiedException("Transaction cannot be done, account not verified");
-            }
-        }
-        if (transaction instanceof TransferTransaction) {
-            if (((TransferTransaction) transaction).getWithdrawAccount().getState() == AccountState.NotVerified &&
-                    ((TransferTransaction) transaction).getAmount() > notVerifiedLimit) {
-                transaction.setState(TransactionState.Rollback);
-                throw new NotVerifiedException("Transaction cannot be done, account not verified");
-            }
-        }
+    public void makeTransaction(Transaction transaction) {
         transactions.add(transaction);
-        transaction.execute();
+        transaction.execute(this);
     }
     /**
      * rollback transaction

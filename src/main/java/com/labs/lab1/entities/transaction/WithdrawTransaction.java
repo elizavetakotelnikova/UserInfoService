@@ -1,7 +1,10 @@
 package com.labs.lab1.entities.transaction;
 
 import com.labs.lab1.entities.account.Account;
+import com.labs.lab1.entities.bank.Bank;
+import com.labs.lab1.valueObjects.AccountState;
 import com.labs.lab1.valueObjects.TransactionState;
+import exceptions.NotVerifiedException;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -20,8 +23,10 @@ public class WithdrawTransaction extends Transaction {
         this.backUpAccountBalance = account.getBalance();
     }
     @Override
-    public void execute() {
+    public void execute(Bank bank) {
         try {
+            if ((account.getState() == AccountState.NotVerified) && (amount > bank.getNotVerifiedLimit()))
+                throw new NotVerifiedException("Transaction cannot be done, account not verified");
             account.withdraw(amount);
             backUp();
         }

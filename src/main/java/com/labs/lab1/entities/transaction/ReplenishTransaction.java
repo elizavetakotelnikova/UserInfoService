@@ -1,6 +1,7 @@
 package com.labs.lab1.entities.transaction;
 
 import com.labs.lab1.entities.account.Account;
+import com.labs.lab1.entities.bank.Bank;
 import com.labs.lab1.entities.transaction.Command;
 import com.labs.lab1.valueObjects.TransactionState;
 import lombok.Getter;
@@ -19,7 +20,7 @@ public class ReplenishTransaction extends Transaction {
         this.backUpAccountBalance = account.getBalance();
     }
     @Override
-    public void execute() {
+    public void execute(Bank bank) {
         try {
             account.replenish(amount);
             backUp();

@@ -1,8 +1,11 @@
 package com.labs.lab1.entities.transaction;
 
 import com.labs.lab1.entities.account.Account;
+import com.labs.lab1.entities.bank.Bank;
 import com.labs.lab1.entities.bank.CentralBank;
+import com.labs.lab1.valueObjects.AccountState;
 import com.labs.lab1.valueObjects.TransactionState;
+import exceptions.NotVerifiedException;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -27,12 +30,14 @@ public class TransferTransaction extends Transaction {
         this.backUpReplenishAccountBalance = replenishAccount.getBalance();
     }
     @Override
-    public void execute() {
+    public void execute(Bank bank) {
         if (withdrawAccount.getBankId() != replenishAccount.getBankId()){
             var commission = CentralBank.getInstance().checkTransferConditions(withdrawAccount.getBankId(), replenishAccount.getBankId());
             amount *= commission;
         }
         try {
+            if ((withdrawAccount.getState() == AccountState.NotVerified) && (amount > bank.getNotVerifiedLimit()))
+                throw new NotVerifiedException("Transaction cannot be done, account not verified");
             withdrawAccount.withdraw(amount);
             replenishAccount.replenish(amount);
             backUp();
@@ -44,7 +49,6 @@ public class TransferTransaction extends Transaction {
         withdrawAccount.getTransactionsHistory().add(this);
         replenishAccount.getTransactionsHistory().add(this);
         this.state = TransactionState.Commit;
-
     }
     public void backUp() {
         withdrawedAmount = backUpWithDrawAccountBalance - withdrawAccount.getBalance();

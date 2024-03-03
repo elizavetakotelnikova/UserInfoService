@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -103,7 +104,7 @@ class Lab1ApplicationTests {
     }
 
     @Test
-    void creditLimitTest() throws NotVerifiedException {
+    void creditLimitTest() {
         Account account = null;
         try {
             account = testBank.createCreditAccount(testCustomer, 50000);
@@ -111,7 +112,8 @@ class Lab1ApplicationTests {
             throw new RuntimeException(e);
         }
         var transaction = new WithdrawTransaction(account, 1000000);
-        assertThrows(NotVerifiedException.class, () -> testBank.makeTransaction(transaction));
+        testBank.makeTransaction(transaction);
+        //assertThrows(NotVerifiedException.class, () -> testBank.makeTransaction(transaction));
         assert(transaction.getState() == TransactionState.Rollback);
     }
 
@@ -123,8 +125,10 @@ class Lab1ApplicationTests {
         } catch (IncorrectArgumentsException e) {
             throw new RuntimeException(e);
         }
-        Account finalAccount = account;
-        assertThrows(NotVerifiedException.class, () -> testBank.makeTransaction(new WithdrawTransaction(finalAccount, 60000)));
+        var transaction = new WithdrawTransaction(account, 60000);
+        testBank.makeTransaction(transaction);
+        assertEquals(TransactionState.Rollback, transaction.getState());
+        //assertThrows(NotVerifiedException.class, () -> testBank.makeTransaction(new WithdrawTransaction(finalAccount, 60000)));
     }
 
     @Test
