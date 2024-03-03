@@ -31,10 +31,9 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
     private String name;
     private List<Customer> customers = new ArrayList<>();
     private List<Account> accounts = new ArrayList<>();
-    private List<RangeConditionsInfo> savingsAccountsConditions = new ArrayList<>();
+    private List<RangeConditionsInfo> savingsAccountsConditions;
     private List<Transaction> transactions = new ArrayList<>();
     private List<NotificationGetable> subscribers = new ArrayList<>();
-    //BankNotificationCenter bankNotificationCenter = new BankNotificationCenter(this);
     private double checkingAccountPercentage;
     private double baseCreditCommission;
     private double loanRate;
@@ -151,16 +150,14 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
      */
 
     public Account createSavingsAccount(Customer customer, double amount, int monthsQuantity) throws IncorrectArgumentsException {
-        //max sum exists
         if (monthsQuantity == 0 || amount == 0) throw new IncorrectArgumentsException("Incorrect data, cannot create account");
         var foundPercentage = findConditions(amount);
         var createdAccount = new SavingsAccount(customer.getId(), id, amount, notVerifiedLimit,
                 AccountState.NotVerified,
                 LocalDate.now().plusMonths(monthsQuantity),
                 foundPercentage.getPercentage());
-        if (customer.getAddress() != null && customer.getPassportData() != null) {
+        if (customer.getAddress() != null && customer.getPassportData() != null)
             createdAccount.setState(AccountState.Verified);
-        }
         accounts.add(createdAccount);
         return createdAccount;
     }
@@ -189,12 +186,11 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
      */
     public void changeBaseCommission(double updatedCommission) {
         baseCreditCommission = updatedCommission;
-        for (Account account : accounts) {
-            if (account instanceof CreditAccount) {
-                ((CreditAccount) (account)).setCommissionRate(baseCreditCommission);
-                var customer = customers.stream().filter(x -> x.getId().equals(account.getUserId())).findAny().get();
-                if (subscribers.contains(customer)) customer.getNotification("New commission set by bank");
-            }
+        var accountsList = accounts.stream().filter(CreditAccount.class::isInstance).toList();
+        for (Account account : accountsList) {
+            ((CreditAccount) (account)).setCommissionRate(baseCreditCommission);
+            var customer = customers.stream().filter(x -> x.getId().equals(account.getUserId())).findAny().get();
+            if (subscribers.contains(customer)) customer.getNotification("New commission set by bank");
         }
     }
 
@@ -205,12 +201,11 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
     public void changeSavingsPercentageCommission(List<RangeConditionsInfo> updatedSavingsAccountConditions) {
         //проценты по депозитам не меняются до срока истечения договора
         savingsAccountsConditions = updatedSavingsAccountConditions;
-        for (Account account : accounts) {
-            if (account instanceof SavingsAccount) {
-                //((SavingsAccount) (account)).setPercentage(findConditions(account.getBalance()).getPercentage());
-                var customer = customers.stream().filter(x -> x.getId().equals(account.getUserId())).findAny().get();
-                if (subscribers.contains(customer)) customer.getNotification("New conditions offered by bank, see updated conditions");
-            }
+        var accountsList = accounts.stream().filter(SavingsAccount.class::isInstance).toList();
+        for (Account account : accountsList) {
+            //((SavingsAccount) (account)).setPercentage(findConditions(account.getBalance()).getPercentage());
+            var customer = customers.stream().filter(x -> x.getId().equals(account.getUserId())).findAny().get();
+            if (subscribers.contains(customer)) customer.getNotification("New conditions offered by bank, see updated conditions");
         }
     }
 
@@ -220,12 +215,11 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
      */
     public void changeCheckingAccountsPercentage(double updatedCheckingAccountPercentage) {
         checkingAccountPercentage = updatedCheckingAccountPercentage;
-        for (Account account : accounts) {
-            if (account instanceof CheckingAccount) {
-                ((CheckingAccount) (account)).setPercentage(updatedCheckingAccountPercentage);
-                var customer = customers.stream().filter(x -> x.getId().equals(account.getUserId())).findAny().get();
-                if (subscribers.contains(customer)) customer.getNotification("New balance percentage set by bank");
-            }
+        var accountsList = accounts.stream().filter(CheckingAccount.class::isInstance).toList();
+        for (Account account : accountsList) {
+            ((CheckingAccount) (account)).setPercentage(updatedCheckingAccountPercentage);
+            var customer = customers.stream().filter(x -> x.getId().equals(account.getUserId())).findAny().get();
+            if (subscribers.contains(customer)) customer.getNotification("New balance percentage set by bank");
         }
     }
 

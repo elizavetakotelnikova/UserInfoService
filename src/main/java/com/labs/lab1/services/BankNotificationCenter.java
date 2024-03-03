@@ -1,4 +1,4 @@
-package com.labs.lab1.services;
+/*package com.labs.lab1.services;
 import com.labs.lab1.entities.account.Account;
 import com.labs.lab1.entities.bank.Bank;
 import com.labs.lab1.entities.customer.Customer;
@@ -7,19 +7,19 @@ import java.lang.reflect.AccessFlag;
 import java.util.ArrayList;
 import java.util.List;
 
-/*public class BankNotificationCenter implements Observable {
-    private final List<Customer> subscribedCustomers = new ArrayList<>();
+public class BankNotificationCenter implements Observable {
+    private final List<NotificationGetable> subscribedCustomers = new ArrayList<>();
     private Bank bank;
     public BankNotificationCenter(Bank bank) {
         this.bank = bank;
     }
     @Override
-    public void RegisterObserver(Customer subscriber) {
+    public void RegisterObserver(NotificationGetable subscriber) {
         subscribedCustomers.add(subscriber);
     }
 
     @Override
-    public void RemoveObserver(Customer subscriber) {
+    public void RemoveObserver(NotificationGetable subscriber) {
         subscribedCustomers.remove(subscriber);
     }
 
