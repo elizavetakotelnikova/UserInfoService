@@ -10,9 +10,11 @@ import lombok.Getter;
 import java.util.UUID;
 
 public class WithdrawTransaction extends Transaction {
+    @Getter
     private final Account account;
     private final double backUpAccountBalance;
     private double withdrawedAmount;
+    @Getter
     private final double amount;
     public WithdrawTransaction(Account account, double amount) {
         this.id = UUID.randomUUID();

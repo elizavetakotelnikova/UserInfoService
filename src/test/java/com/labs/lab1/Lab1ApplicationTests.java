@@ -6,7 +6,6 @@ import com.labs.lab1.entities.bank.CreateBankDTO;
 import com.labs.lab1.entities.customer.Customer;
 import com.labs.lab1.entities.transaction.ReplenishTransaction;
 import com.labs.lab1.models.RangeConditionsInfo;
-import com.labs.lab1.services.CommandInvokerImpl;
 import com.labs.lab1.entities.transaction.WithdrawTransaction;
 import com.labs.lab1.services.TimeMachineService;
 import com.labs.lab1.valueObjects.TransactionState;
@@ -15,7 +14,6 @@ import exceptions.NotVerifiedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -48,39 +46,36 @@ class Lab1ApplicationTests {
         }
     }
     @Test
-    void withdrawIncorrectAmount() {
+    void withdrawIncorrectAmount() throws NotVerifiedException {
         Account account = null;
         try {
             account = testBank.createSavingsAccount(testCustomer, 5000, 6);
         } catch (IncorrectArgumentsException e) {
             throw new RuntimeException(e);
         }
-        var commandInvoker = new CommandInvokerImpl();
         var secondTransaction = new WithdrawTransaction(account, 7000);
-        commandInvoker.Consume(new WithdrawTransaction(account, 50));
+        testBank.makeTransaction(new WithdrawTransaction(account, 50));
         assert(account.getBalance() == 4950);
-        commandInvoker.Consume(secondTransaction);
+        testBank.makeTransaction(secondTransaction);
         assert(account.getBalance() == 4950);
         assert(secondTransaction.getState() == TransactionState.Rollback);
     }
 
     @Test
-    void withdrawFromCreditAccount() {
-        var commandInvoker = new CommandInvokerImpl();
+    void withdrawFromCreditAccount() throws NotVerifiedException {
         Account account = null;
         try {
             account = testBank.createCreditAccount(testCustomer, 50000); //commandInvoker.Consume(new CreateCreditCommand(testCustommer, 50000);
         } catch (IncorrectArgumentsException e) {
             throw new RuntimeException(e);
         }
-        commandInvoker.Consume(new WithdrawTransaction(account, 50));
-        commandInvoker.Consume(new WithdrawTransaction(account, 500));
+        testBank.makeTransaction(new WithdrawTransaction(account, 50));
+        testBank.makeTransaction(new WithdrawTransaction(account, 50));
         assert(account.getBalance() == (0 - 50 - 500 - testBank.getBaseCreditCommission()));
     }
 
     @Test
-    void undoReplenish() {
-        var commandInvoker = new CommandInvokerImpl();
+    void undoReplenish() throws NotVerifiedException {
         Account account = null;
         try {
             account = testBank.createCreditAccount(testCustomer, 50000); //commandInvoker.Consume(new CreateCreditCommand(testCustommer, 50000);
@@ -88,8 +83,8 @@ class Lab1ApplicationTests {
             throw new RuntimeException(e);
         }
         var replenish = new ReplenishTransaction(account, 50);
-        commandInvoker.Consume(replenish);
-        commandInvoker.Consume(new WithdrawTransaction(account, 500));
+        testBank.makeTransaction(replenish);
+        testBank.makeTransaction(new WithdrawTransaction(account, 500));
         testBank.rollbackTransaction(replenish.getId());
         assert(account.getBalance() == (0 - 500 - testBank.getBaseCreditCommission()));
     }
@@ -108,16 +103,15 @@ class Lab1ApplicationTests {
     }
 
     @Test
-    void creditLimitTest() {
+    void creditLimitTest() throws NotVerifiedException {
         Account account = null;
         try {
             account = testBank.createCreditAccount(testCustomer, 50000);
         } catch (IncorrectArgumentsException e) {
             throw new RuntimeException(e);
         }
-        var commandInvoker = new CommandInvokerImpl();
         var transaction = new WithdrawTransaction(account, 1000000);
-        commandInvoker.Consume(transaction);
+        assertThrows(NotVerifiedException.class, () -> testBank.makeTransaction(transaction));
         assert(transaction.getState() == TransactionState.Rollback);
     }
 

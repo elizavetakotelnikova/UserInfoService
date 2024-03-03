@@ -21,15 +21,13 @@ public abstract class Account implements Replenishable, Withdrowable {
     protected UUID userId;
     protected UUID bankId;
     protected double balance;
-    protected double notVerifiedLimit;
     protected AccountState state;
     protected List<Transaction> transactionsHistory = new ArrayList<>();
-    public Account(UUID userId, UUID bankId, double balance, double notVerifiedLimit, AccountState state) {
+    public Account(UUID userId, UUID bankId, double balance, AccountState state) {
         this.id = UUID.randomUUID();
         this.userId = userId;
         this.bankId = bankId;
         this.balance = balance;
-        this.notVerifiedLimit = notVerifiedLimit;
         this.state = state;
     }
 
@@ -40,8 +38,8 @@ public abstract class Account implements Replenishable, Withdrowable {
 
     @Override
     public void withdraw(double amount) throws NotEnoughMoneyException, NotVerifiedException {
+        //if (state == AccountState.NotVerified && amount > notVerifiedLimit) throw new NotVerifiedException("Transaction cannot be done, account not verified");
         if (balance < amount) throw new NotEnoughMoneyException("Transaction cannot be done");
-        if (state == AccountState.NotVerified && amount > notVerifiedLimit) throw new NotVerifiedException("Transaction cannot be done, account not verified");
         balance -= amount;
     }
 }

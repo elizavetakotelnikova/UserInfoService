@@ -3,16 +3,20 @@ package com.labs.lab1.entities.transaction;
 import com.labs.lab1.entities.account.Account;
 import com.labs.lab1.entities.bank.CentralBank;
 import com.labs.lab1.valueObjects.TransactionState;
+import lombok.Getter;
 
 import java.util.UUID;
 
 public class TransferTransaction extends Transaction {
+    @Getter
     private final Account withdrawAccount;
+    @Getter
     private final Account replenishAccount;
     private final double backUpWithDrawAccountBalance;
     private final double backUpReplenishAccountBalance;
     private double withdrawedAmount;
     private double replenishedAmount;
+    @Getter
     private double amount;
     public TransferTransaction(Account withdrawAccount, Account replenishAccount, double amount) {
         this.id = UUID.randomUUID();

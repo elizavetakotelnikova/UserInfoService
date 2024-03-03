@@ -7,10 +7,14 @@ import com.labs.lab1.entities.account.SavingsAccount;
 import com.labs.lab1.entities.customer.Customer;
 import com.labs.lab1.entities.transaction.Command;
 import com.labs.lab1.entities.transaction.Transaction;
+import com.labs.lab1.entities.transaction.TransferTransaction;
+import com.labs.lab1.entities.transaction.WithdrawTransaction;
 import com.labs.lab1.models.*;
 import com.labs.lab1.services.*;
 import com.labs.lab1.valueObjects.AccountState;
+import com.labs.lab1.valueObjects.TransactionState;
 import exceptions.IncorrectArgumentsException;
+import exceptions.NotVerifiedException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +34,7 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
     private List<RangeConditionsInfo> savingsAccountsConditions = new ArrayList<>();
     private List<Command> transactions = new ArrayList<>();
     private List<NotificationGetable> subscribers = new ArrayList<>();
+    //BankNotificationCenter bankNotificationCenter = new BankNotificationCenter(this);
     private double checkingAccountPercentage;
     private double baseCreditCommission;
     private double loanRate;
@@ -128,7 +133,7 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
      */
     public Account createCheckingAccount(Customer customer) {
         var createdAccount = new CheckingAccount(customer.getId(), id, 0,
-                notVerifiedLimit,  AccountState.NotVerified, checkingAccountPercentage);
+               AccountState.NotVerified, checkingAccountPercentage);
         if (customer.getAddress() != null && customer.getPassportData() != null) {
             createdAccount.setState(AccountState.Verified);
         }
@@ -225,7 +230,26 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
         }
     }
 
-    public void makeTransaction(Transaction transaction) {
+    /**
+     * provides transaction
+     * @param transaction transaction to be done
+     * @throws NotVerifiedException if account is not verified and amount is bigger than allowed limit
+     */
+    public void makeTransaction(Transaction transaction) throws NotVerifiedException {
+        if (transaction instanceof WithdrawTransaction) {
+            if (((WithdrawTransaction) transaction).getAccount().getState() == AccountState.NotVerified &&
+                    ((WithdrawTransaction) transaction).getAmount() > notVerifiedLimit) {
+                transaction.setState(TransactionState.Rollback);
+                throw new NotVerifiedException("Transaction cannot be done, account not verified");
+            }
+        }
+        if (transaction instanceof TransferTransaction) {
+            if (((TransferTransaction) transaction).getWithdrawAccount().getState() == AccountState.NotVerified &&
+                    ((TransferTransaction) transaction).getAmount() > notVerifiedLimit) {
+                transaction.setState(TransactionState.Rollback);
+                throw new NotVerifiedException("Transaction cannot be done, account not verified");
+            }
+        }
         transaction.execute();
     }
     /**

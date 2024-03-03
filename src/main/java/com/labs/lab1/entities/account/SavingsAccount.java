@@ -16,20 +16,19 @@ public class SavingsAccount extends Account implements Updatable {
      * @param userId - user id
      * @param bankId - bank id
      * @param balance - current account balance
-     * @param notVerifiedLimit - withdraw/replenish limit for not verified accounts
      * @param state - account state (verified/not verified)
      * @param endDate - date of account closing
      * @param percentage - percentage
      */
     public SavingsAccount(UUID userId, UUID bankId, double balance, double notVerifiedLimit, AccountState state,
                           LocalDate endDate, double percentage) {
-        super(userId, bankId, balance, notVerifiedLimit, state);
+        super(userId, bankId, balance, state);
         this.endDate = endDate;
         this.percentage = percentage;
     }
     public SavingsAccount(UUID id, UUID userId, UUID bankId, double balance, double notVerifiedLimit, AccountState state,
                           LocalDate endDate, double percentage) {
-        super(userId, bankId, balance, notVerifiedLimit, state);
+        super(userId, bankId, balance, state);
         this.id = id;
         this.endDate = endDate;
         this.percentage = percentage;

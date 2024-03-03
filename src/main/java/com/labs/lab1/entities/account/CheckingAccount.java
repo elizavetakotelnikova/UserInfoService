@@ -15,18 +15,17 @@ public class CheckingAccount extends Account implements Updatable {
      * @param userId - user id
      * @param bankId - bank id
      * @param balance - current account balance
-     * @param notVerifiedLimit - withdraw/replenish limit for not verified accounts
      * @param state - account state (verified/not verified)
      * @param percentage - balance percentage
      */
-    public CheckingAccount (UUID userId, UUID bankId, double balance, double notVerifiedLimit, AccountState state, double percentage) {
-        super(userId, bankId, balance, notVerifiedLimit, state);
+    public CheckingAccount (UUID userId, UUID bankId, double balance, AccountState state, double percentage) {
+        super(userId, bankId, balance, state);
         this.percentage = percentage;
     }
     private double percentage;
 
-    public CheckingAccount (UUID id, UUID userId, UUID bankId, double balance, double notVerifiedLimit, AccountState state, double percentage) {
-        super(userId, bankId, balance, notVerifiedLimit, state);
+    public CheckingAccount (UUID id, UUID userId, UUID bankId, double balance, AccountState state, double percentage) {
+        super(userId, bankId, balance, state);
         this.id = id;
         this.percentage = percentage;
     }
