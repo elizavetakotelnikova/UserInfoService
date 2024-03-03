@@ -14,6 +14,17 @@ import static java.lang.Math.abs;
 @Getter
 @Setter
 public class CreditAccount extends Account implements Updatable {
+    /**
+     *
+     * @param userId - user id
+     * @param bankId - bank id
+     * @param balance - current account balance
+     * @param notVerifiedLimit - withdraw/replenish limit for not verified accounts
+     * @param state - account state (verified/not verified)
+     * @param commissionRate - withdraw/replenish commission when balance < 0 (in rubles)
+     * @param limit - credit limit
+     * @param loanRate - credit percentage
+     */
     public CreditAccount(UUID userId, UUID bankId, double balance, double notVerifiedLimit, AccountState state, double commissionRate, double limit, double loanRate) {
         super(userId, bankId, balance, notVerifiedLimit, state);
         this.commissionRate = commissionRate;
@@ -31,11 +42,23 @@ public class CreditAccount extends Account implements Updatable {
     private double commissionRate;
     private double loanRate;
     private double limit;
+
+    /**
+     * replenishing the account (including commission rate)
+     * @param amount - amount of money
+     */
     @Override
     public void replenish(double amount) {
         balance += amount;
         balance -= commissionRate;
     }
+
+    /**
+     * withdrawingmoney
+     * @param amount - amount of money
+     * @throws NotEnoughMoneyException - not enough money to withdraw or credit limit is fully used
+     * @throws NotVerifiedException - trying to withdraw amount more than not verified limit
+     */
     @Override
     public void withdraw(double amount) throws NotEnoughMoneyException, NotVerifiedException {
         if (state == AccountState.NotVerified && amount > notVerifiedLimit) throw new NotVerifiedException("Transaction cannot be done, account not verified");
@@ -50,6 +73,9 @@ public class CreditAccount extends Account implements Updatable {
         }
     }
 
+    /**
+     * monthly update => loanRate is charged
+     */
     @Override
     public void makeRegularUpdate() {
         if (balance < 0) balance -= balance * (loanRate / 100);

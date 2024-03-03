@@ -16,6 +16,13 @@ public class CentralBank implements BankCreatable {
         }
         return instance;
     }
+
+    /**
+     * creating new bank
+     * @param info bank info: name, conditions, limits
+     * @return new bank if data is correct
+     * @throws IncorrectArgumentsException if required arguments not set
+     */
     @Override
     public Bank createBank(CreateBankDTO info) throws IncorrectArgumentsException {
         if (info.getName().isEmpty())
@@ -26,10 +33,21 @@ public class CentralBank implements BankCreatable {
         banks.add(createdBank);
         return createdBank;
     }
+
+    /**
+     * managing moeny transfer from one bank to another
+     * @param firstBank
+     * @param secondBank
+     * @return commission
+     */
     public double checkTransferConditions(UUID firstBank, UUID secondBank) {
         return 0.01;
         // should consist of conditions based on banks
     }
+
+    /**
+     * notifying banks to update accounts
+     */
     public void NotifyBanks() {
         banks.forEach(Bank::updateAccount);
     }

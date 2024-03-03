@@ -11,7 +11,6 @@ import java.util.UUID;
 
 @Data
 @AllArgsConstructor
-@Builder
 public class Customer implements NotificationGetable {
     private UUID id;
     private String firstName;
@@ -26,6 +25,10 @@ public class Customer implements NotificationGetable {
         this.passportData = passportData;
     }
 
+    /**
+     * get notification
+     * @param message message to get
+     */
     @Override
     public void getNotification(String message) {
         System.out.println("Got notification");

@@ -10,6 +10,15 @@ import java.util.UUID;
 @Getter
 @Setter
 public class CheckingAccount extends Account implements Updatable {
+    /**
+     * Checking account
+     * @param userId - user id
+     * @param bankId - bank id
+     * @param balance - current account balance
+     * @param notVerifiedLimit - withdraw/replenish limit for not verified accounts
+     * @param state - account state (verified/not verified)
+     * @param percentage - balance percentage
+     */
     public CheckingAccount (UUID userId, UUID bankId, double balance, double notVerifiedLimit, AccountState state, double percentage) {
         super(userId, bankId, balance, notVerifiedLimit, state);
         this.percentage = percentage;
@@ -22,7 +31,9 @@ public class CheckingAccount extends Account implements Updatable {
         this.percentage = percentage;
     }
 
-
+    /**
+     * monthly account update (percentage calculating)
+     */
     @Override
     public void makeRegularUpdate() {
         this.balance += this.balance * (percentage / 100);

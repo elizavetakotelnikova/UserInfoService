@@ -14,10 +14,14 @@ import exceptions.IncorrectArgumentsException;
 import exceptions.NotVerifiedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 class Lab1ApplicationTests {
 
@@ -37,7 +41,11 @@ class Lab1ApplicationTests {
         } catch (IncorrectArgumentsException e) {
             throw new RuntimeException(e);
         }
-        testCustomer = Customer.builder().firstName("Maria").lastName("Chistyakova").build();
+        try {
+            testCustomer =  testBank.createCustomer(null, null, "Maria", "Chistyakova");
+        } catch (IncorrectArgumentsException e) {
+            throw new RuntimeException(e);
+        }
     }
     @Test
     void withdrawIncorrectAmount() {
@@ -123,6 +131,26 @@ class Lab1ApplicationTests {
         }
         Account finalAccount = account;
         assertThrows(NotVerifiedException.class, () -> finalAccount.withdraw(60000));
+    }
+
+    @Test
+    void notificationsTest() {
+        // creating customer mock
+        Customer customer = mock(Customer.class);
+        testBank.getCustomers().add(customer);
+        Mockito.when(customer.getId()).thenReturn(UUID.randomUUID());
+        // creating account
+        try {
+            testBank.createCreditAccount(customer, 50000);
+        } catch (IncorrectArgumentsException e) {
+            throw new RuntimeException(e);
+        }
+        // subscribe mock to notifications
+        testBank.RegisterObserver(customer);
+        // change commission => notify subscribers
+        testBank.changeBaseCommission(200);
+        // verify
+        verify(customer, times(1)).getNotification("New commission set by bank");
     }
 
 }

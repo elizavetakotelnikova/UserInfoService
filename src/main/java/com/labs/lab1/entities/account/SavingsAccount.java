@@ -11,6 +11,16 @@ import java.util.UUID;
 @Getter
 @Setter
 public class SavingsAccount extends Account implements Updatable {
+    /**
+     *
+     * @param userId - user id
+     * @param bankId - bank id
+     * @param balance - current account balance
+     * @param notVerifiedLimit - withdraw/replenish limit for not verified accounts
+     * @param state - account state (verified/not verified)
+     * @param endDate - date of account closing
+     * @param percentage - percentage
+     */
     public SavingsAccount(UUID userId, UUID bankId, double balance, double notVerifiedLimit, AccountState state,
                           LocalDate endDate, double percentage) {
         super(userId, bankId, balance, notVerifiedLimit, state);
@@ -27,6 +37,9 @@ public class SavingsAccount extends Account implements Updatable {
     private LocalDate endDate;
     private double percentage;
 
+    /**
+     * monthly update => new sum is added based on a percentage
+     */
     @Override
     public void makeRegularUpdate() {
         if (endDate.isAfter(LocalDate.now())) balance += balance * (percentage / 100);
