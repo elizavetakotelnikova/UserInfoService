@@ -1,5 +1,6 @@
 package com.labs.lab1.entities.bank;
 
+import com.labs.lab1.entities.transaction.Transaction;
 import com.labs.lab1.services.BankCreatable;
 import exceptions.IncorrectArgumentsException;
 

@@ -102,7 +102,6 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
         customers.add(createdCustomer);
         return createdCustomer;
     }
-
     /**
      * creating credit account
      * @param customer
@@ -118,13 +117,13 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
                 limit,
                 loanRate
         );
-        if (customer.getAddress() != null && customer.getPassportData() != null) {
-            createdAccount.setState(AccountState.Verified);
-        }
+        if (customer.checkVerification()) createdAccount.setState(AccountState.Verified);
         accounts.add(createdAccount);
         return createdAccount;
     }
-
+    public void checkAreAccountsVerified(Customer customer) {
+        if (customer.checkVerification()) accounts.stream().filter(x -> x.getUserId() == customer.getId()).forEach(x -> x.setState(AccountState.Verified));
+    }
     /**
      * creating checking account
      * @param customer
@@ -139,7 +138,6 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
         accounts.add(createdAccount);
         return createdAccount;
     }
-
     /**
      * creating savings account
      * @param customer
@@ -148,7 +146,6 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
      * @return
      * @throws IncorrectArgumentsException when months quantity or amount is not set
      */
-
     public Account createSavingsAccount(Customer customer, double amount, int monthsQuantity) throws IncorrectArgumentsException {
         if (monthsQuantity == 0 || amount == 0) throw new IncorrectArgumentsException("Incorrect data, cannot create account");
         var foundPercentage = findConditions(amount);
@@ -171,7 +168,6 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
                 conditions -> amount >= conditions.getStartAmount() && amount <= conditions.getEndAmount()
         ).findAny().get();
     }
-
     /**
      * update every account in a bank
      */
@@ -179,7 +175,6 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
     public void updateAccount() {
         accounts.stream().filter(x -> x instanceof Updatable).forEach(x -> ((Updatable) x).makeRegularUpdate());
     }
-
     /**
      * changing commission for credit accounts and notifying subscribed users
      * @param updatedCommission new commission
@@ -193,7 +188,6 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
             if (subscribers.contains(customer)) customer.getNotification("New commission set by bank");
         }
     }
-
     /**
      * changing conditions for saving account and notifying subscribed users
      * @param updatedSavingsAccountConditions
@@ -208,7 +202,6 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
             if (subscribers.contains(customer)) customer.getNotification("New conditions offered by bank, see updated conditions");
         }
     }
-
     /**
      * changing checking accounts percentage and notifying subscribed users
      * @param updatedCheckingAccountPercentage
@@ -222,7 +215,6 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
             if (subscribers.contains(customer)) customer.getNotification("New balance percentage set by bank");
         }
     }
-
     /**
      * provides transaction
      * @param transaction transaction to be done

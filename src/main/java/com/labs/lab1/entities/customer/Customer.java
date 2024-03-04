@@ -3,6 +3,7 @@ package com.labs.lab1.entities.customer;
 import com.labs.lab1.models.Address;
 import com.labs.lab1.models.PassportData;
 import com.labs.lab1.services.NotificationGetable;
+import com.labs.lab1.valueObjects.AccountState;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,5 +34,9 @@ public class Customer implements NotificationGetable {
     public void getNotification(String message) {
         System.out.println("Got notification");
         // send to user via api
+    }
+
+    public boolean checkVerification() {
+        return passportData != null && address != null;
     }
 }
