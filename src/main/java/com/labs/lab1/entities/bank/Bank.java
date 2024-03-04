@@ -38,7 +38,6 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
     private double baseCreditCommission;
     private double loanRate;
     private double notVerifiedLimit;
-
     /**
      *
      * @param name - bank name
@@ -58,7 +57,6 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
         this.loanRate = loanRate;
         this.notVerifiedLimit = notVerifiedLimit;
     }
-
     /**
      * subscribing to bank notification
      * @param subscriber
@@ -67,7 +65,6 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
     public void RegisterObserver(NotificationGetable subscriber) {
         subscribers.add(subscriber);
     }
-
     /**
      * removing notifications' subscriber
      * @param subscriber
@@ -76,7 +73,6 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
     public void RemoveObserver(NotificationGetable subscriber) {
         subscribers.remove(subscriber);
     }
-
     /**
      * notifying all subscibers
      * @param message
@@ -85,7 +81,6 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
     public void NotifyObservers(String message) {
         subscribers.forEach(x -> x.getNotification(message));
     }
-
     /**
      * creating customer and adding to customers list
      * @param address

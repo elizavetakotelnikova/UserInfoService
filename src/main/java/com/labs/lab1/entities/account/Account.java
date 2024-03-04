@@ -1,5 +1,6 @@
 package com.labs.lab1.entities.account;
 
+import com.labs.lab1.entities.bank.CentralBank;
 import com.labs.lab1.entities.transaction.Command;
 import com.labs.lab1.entities.transaction.Transaction;
 import com.labs.lab1.services.Replenishable;
@@ -41,5 +42,10 @@ public abstract class Account implements Replenishable, Withdrowable {
         //if (state == AccountState.NotVerified && amount > notVerifiedLimit) throw new NotVerifiedException("Transaction cannot be done, account not verified");
         if (balance < amount) throw new NotEnoughMoneyException("Transaction cannot be done");
         balance -= amount;
+    }
+    public void checkAccountState() {
+       var bank = CentralBank.getInstance().getBanks().stream().filter(x -> x.getId() == bankId).findAny().get();
+       var user = bank.getCustomers().stream().filter(x -> x.getId() == userId).findAny().get();
+       if (user.checkVerification()) state = AccountState.Verified;
     }
 }

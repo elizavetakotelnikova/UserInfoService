@@ -3,6 +3,7 @@ package com.labs.lab1.entities.bank;
 import com.labs.lab1.entities.transaction.Transaction;
 import com.labs.lab1.services.BankCreatable;
 import exceptions.IncorrectArgumentsException;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 public class CentralBank implements BankCreatable {
     private static CentralBank instance;
+    @Getter
     public List<Bank> banks = new ArrayList<>();
     public static CentralBank getInstance() {
         if (instance == null) {
