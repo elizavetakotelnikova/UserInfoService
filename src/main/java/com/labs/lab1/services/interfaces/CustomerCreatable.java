@@ -1,4 +1,4 @@
-package com.labs.lab1.services;
+package com.labs.lab1.services.interfaces;
 
 import com.labs.lab1.entities.customer.Customer;
 import com.labs.lab1.models.Address;

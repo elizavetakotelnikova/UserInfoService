@@ -1,6 +1,7 @@
-package com.labs.lab1.services;
+package com.labs.lab1.services.implementations;
 
 import com.labs.lab1.entities.account.Account;
+import com.labs.lab1.services.interfaces.Updatable;
 
 public class TimeMachineService {
     public void makeAllUpdates(Updatable updatable, int monthsQuantity) {

@@ -5,27 +5,24 @@ import com.labs.lab1.entities.account.CheckingAccount;
 import com.labs.lab1.entities.account.CreditAccount;
 import com.labs.lab1.entities.account.SavingsAccount;
 import com.labs.lab1.entities.customer.Customer;
-import com.labs.lab1.entities.transaction.Command;
 import com.labs.lab1.entities.transaction.Transaction;
-import com.labs.lab1.entities.transaction.TransferTransaction;
-import com.labs.lab1.entities.transaction.WithdrawTransaction;
 import com.labs.lab1.models.*;
-import com.labs.lab1.services.*;
-import com.labs.lab1.valueObjects.AccountState;
-import com.labs.lab1.valueObjects.TransactionState;
-import exceptions.IncorrectArgumentsException;
+import com.labs.lab1.services.interfaces.NotificationGetable;
+import com.labs.lab1.services.interfaces.Observable;
+import com.labs.lab1.services.interfaces.PercentageCreditable;
+import com.labs.lab1.services.interfaces.Updatable;
 import exceptions.NotVerifiedException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import java.time.LocalDate;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-public class Bank implements CustomerCreatable, PercentageCreditable, Observable {
+public class Bank implements PercentageCreditable, Observable {
     private UUID id;
     @Setter
     private String name;
@@ -39,7 +36,7 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
     private double loanRate;
     private double notVerifiedLimit;
     /**
-     *
+     * bank constructor
      * @param name - bank name
      * @param savingsAccountsConditions - conditions for savings account
      * @param checkingAccountPercentage - balance percentage for checking account
@@ -59,7 +56,7 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
     }
     /**
      * subscribing to bank notification
-     * @param subscriber
+     * @param subscriber notification message
      */
     @Override
     public void RegisterObserver(NotificationGetable subscriber) {
@@ -67,108 +64,26 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
     }
     /**
      * removing notifications' subscriber
-     * @param subscriber
+     * @param subscriber notification message
      */
     @Override
     public void RemoveObserver(NotificationGetable subscriber) {
         subscribers.remove(subscriber);
     }
     /**
-     * notifying all subscibers
-     * @param message
+     * notifying all subscribers
+     * @param message notification message
      */
     @Override
     public void NotifyObservers(String message) {
         subscribers.forEach(x -> x.getNotification(message));
     }
     /**
-     * creating customer and adding to customers list
-     * @param address
-     * @param passportData
-     * @param firstName
-     * @param lastName
-     * @return new customer
-     * @throws IncorrectArgumentsException when first name or last name is not set
-     */
-    @Override
-    public Customer createCustomer(Address address, PassportData passportData, String  firstName, String lastName) throws IncorrectArgumentsException {
-        if (firstName.isEmpty() || lastName.isEmpty()) throw new IncorrectArgumentsException("Required fields are not set");
-        var createdCustomer = new Customer(firstName, lastName, address, passportData);
-        customers.add(createdCustomer);
-        return createdCustomer;
-    }
-    /**
-     * creating credit account
-     * @param customer
-     * @param limit
-     * @return new credit account
-     * @throws IncorrectArgumentsException when credit limit is not set
-     */
-    public Account createCreditAccount(Customer customer, double limit) throws IncorrectArgumentsException {
-        if (limit == 0) throw new IncorrectArgumentsException("Not enough information");
-        var createdAccount = new CreditAccount(customer.getId(), id, 0, notVerifiedLimit,
-                AccountState.NotVerified,
-                baseCreditCommission,
-                limit,
-                loanRate
-        );
-        if (customer.checkVerification()) createdAccount.setState(AccountState.Verified);
-        accounts.add(createdAccount);
-        return createdAccount;
-    }
-    public void checkAreAccountsVerified(Customer customer) {
-        if (customer.checkVerification()) accounts.stream().filter(x -> x.getUserId() == customer.getId()).forEach(x -> x.setState(AccountState.Verified));
-    }
-    /**
-     * creating checking account
-     * @param customer
-     * @return new checking account
-     */
-    public Account createCheckingAccount(Customer customer) {
-        var createdAccount = new CheckingAccount(customer.getId(), id, 0,
-               AccountState.NotVerified, checkingAccountPercentage);
-        if (customer.getAddress() != null && customer.getPassportData() != null) {
-            createdAccount.setState(AccountState.Verified);
-        }
-        accounts.add(createdAccount);
-        return createdAccount;
-    }
-    /**
-     * creating savings account
-     * @param customer
-     * @param amount
-     * @param monthsQuantity
-     * @return
-     * @throws IncorrectArgumentsException when months quantity or amount is not set
-     */
-    public Account createSavingsAccount(Customer customer, double amount, int monthsQuantity) throws IncorrectArgumentsException {
-        if (monthsQuantity == 0 || amount == 0) throw new IncorrectArgumentsException("Incorrect data, cannot create account");
-        var foundPercentage = findConditions(amount);
-        var createdAccount = new SavingsAccount(customer.getId(), id, amount, notVerifiedLimit,
-                AccountState.NotVerified,
-                LocalDate.now().plusMonths(monthsQuantity),
-                foundPercentage.getPercentage());
-        if (customer.getAddress() != null && customer.getPassportData() != null)
-            createdAccount.setState(AccountState.Verified);
-        accounts.add(createdAccount);
-        return createdAccount;
-    }
-    /**
-     * find conditions for saving account based on range
-     * @param amount
-     * @return range and percentage for given amount of money
-     */
-    public RangeConditionsInfo findConditions(double amount) {
-        return savingsAccountsConditions.stream().filter(
-                conditions -> amount >= conditions.getStartAmount() && amount <= conditions.getEndAmount()
-        ).findAny().get();
-    }
-    /**
      * update every account in a bank
      */
     @Override
-    public void updateAccount() {
-        accounts.stream().filter(x -> x instanceof Updatable).forEach(x -> ((Updatable) x).makeRegularUpdate());
+    public void creditPercentage() {
+        accounts.forEach(Updatable::makeRegularUpdate);
     }
     /**
      * changing commission for credit accounts and notifying subscribed users
@@ -185,10 +100,9 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
     }
     /**
      * changing conditions for saving account and notifying subscribed users
-     * @param updatedSavingsAccountConditions
+     * @param updatedSavingsAccountConditions new conditions for savings account
      */
     public void changeSavingsPercentageCommission(List<RangeConditionsInfo> updatedSavingsAccountConditions) {
-        //проценты по депозитам не меняются до срока истечения договора
         savingsAccountsConditions = updatedSavingsAccountConditions;
         var accountsList = accounts.stream().filter(SavingsAccount.class::isInstance).toList();
         for (Account account : accountsList) {
@@ -199,7 +113,7 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
     }
     /**
      * changing checking accounts percentage and notifying subscribed users
-     * @param updatedCheckingAccountPercentage
+     * @param updatedCheckingAccountPercentage new checking account percentage
      */
     public void changeCheckingAccountsPercentage(double updatedCheckingAccountPercentage) {
         checkingAccountPercentage = updatedCheckingAccountPercentage;
@@ -213,7 +127,6 @@ public class Bank implements CustomerCreatable, PercentageCreditable, Observable
     /**
      * provides transaction
      * @param transaction transaction to be done
-     * @throws NotVerifiedException if account is not verified and amount is bigger than allowed limit
      */
     public void makeTransaction(Transaction transaction) {
         transactions.add(transaction);

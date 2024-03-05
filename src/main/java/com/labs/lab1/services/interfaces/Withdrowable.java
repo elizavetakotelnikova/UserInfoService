@@ -1,4 +1,4 @@
-package com.labs.lab1.services;
+package com.labs.lab1.services.interfaces;
 
 import exceptions.NotEnoughMoneyException;
 import exceptions.NotVerifiedException;

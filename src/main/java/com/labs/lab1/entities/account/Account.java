@@ -1,10 +1,10 @@
 package com.labs.lab1.entities.account;
 
 import com.labs.lab1.entities.bank.CentralBank;
-import com.labs.lab1.entities.transaction.Command;
 import com.labs.lab1.entities.transaction.Transaction;
-import com.labs.lab1.services.Replenishable;
-import com.labs.lab1.services.Withdrowable;
+import com.labs.lab1.services.interfaces.Replenishable;
+import com.labs.lab1.services.interfaces.Updatable;
+import com.labs.lab1.services.interfaces.Withdrowable;
 import com.labs.lab1.valueObjects.AccountState;
 import exceptions.NotEnoughMoneyException;
 import exceptions.NotVerifiedException;
@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @AllArgsConstructor
 @Data
-public abstract class Account implements Replenishable, Withdrowable {
+public abstract class Account implements Replenishable, Withdrowable, Updatable {
     protected UUID id;
     protected UUID userId;
     protected UUID bankId;

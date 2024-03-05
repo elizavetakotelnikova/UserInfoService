@@ -1,7 +1,7 @@
 package com.labs.lab1.entities.bank;
 
-import com.labs.lab1.entities.transaction.Transaction;
-import com.labs.lab1.services.BankCreatable;
+import com.labs.lab1.models.RangeConditionsInfo;
+import com.labs.lab1.services.interfaces.BankCreatable;
 import exceptions.IncorrectArgumentsException;
 import lombok.Getter;
 
@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Getter
 public class CentralBank implements BankCreatable {
     private static CentralBank instance;
-    @Getter
     public List<Bank> banks = new ArrayList<>();
     public static CentralBank getInstance() {
         if (instance == null) {
@@ -27,18 +27,19 @@ public class CentralBank implements BankCreatable {
      * @throws IncorrectArgumentsException if required arguments not set
      */
     @Override
-    public Bank createBank(CreateBankDTO info) throws IncorrectArgumentsException {
-        if (info.getName().isEmpty())
+    public Bank createBank(String name, List<RangeConditionsInfo> info, double checkingAccountPercentage,
+                           double baseCommission, double loanRate, double notVerifiedLimit) throws IncorrectArgumentsException {
+        if (name.isEmpty())
             throw new IncorrectArgumentsException("Invalid information for bank creating");
-        var createdBank = new Bank(info.getName(), info.getSavingsAccountsConditions(),
-                info.getCheckingAccountPercentage(), info.getBaseCommission(), info.getLoanRate(),
-                info.getNotVerifiedLimit());
+        var createdBank = new Bank(name, info,
+                checkingAccountPercentage, baseCommission, loanRate,
+                notVerifiedLimit);
         banks.add(createdBank);
         return createdBank;
     }
 
     /**
-     * managing moeny transfer from one bank to another
+     * managing money transfer from one bank to another
      * @param firstBank
      * @param secondBank
      * @return commission
@@ -52,6 +53,6 @@ public class CentralBank implements BankCreatable {
      * notifying banks to update accounts
      */
     public void NotifyBanks() {
-        banks.forEach(Bank::updateAccount);
+        banks.forEach(Bank::creditPercentage);
     }
 }
