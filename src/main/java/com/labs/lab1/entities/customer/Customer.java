@@ -2,10 +2,8 @@ package com.labs.lab1.entities.customer;
 
 import com.labs.lab1.models.Address;
 import com.labs.lab1.models.PassportData;
-import com.labs.lab1.services.NotificationGetable;
-import com.labs.lab1.valueObjects.AccountState;
+import com.labs.lab1.services.interfaces.NotificationGetable;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 
 import java.util.UUID;

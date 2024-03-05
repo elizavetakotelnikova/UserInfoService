@@ -1,4 +1,6 @@
-package com.labs.lab1.services;
+package com.labs.lab1.services.interfaces;
+
+import com.labs.lab1.services.interfaces.NotificationGetable;
 
 public interface Observable
 {

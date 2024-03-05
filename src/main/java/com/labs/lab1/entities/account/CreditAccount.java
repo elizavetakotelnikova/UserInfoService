@@ -1,6 +1,6 @@
 package com.labs.lab1.entities.account;
 
-import com.labs.lab1.services.Updatable;
+import com.labs.lab1.services.interfaces.Updatable;
 import com.labs.lab1.valueObjects.AccountState;
 import exceptions.NotEnoughMoneyException;
 import exceptions.NotVerifiedException;

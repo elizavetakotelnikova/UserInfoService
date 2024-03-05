@@ -2,15 +2,15 @@ package com.labs.lab1;
 import com.labs.lab1.entities.account.Account;
 import com.labs.lab1.entities.bank.Bank;
 import com.labs.lab1.entities.bank.CentralBank;
-import com.labs.lab1.entities.bank.CreateBankDTO;
 import com.labs.lab1.entities.customer.Customer;
 import com.labs.lab1.entities.transaction.ReplenishTransaction;
 import com.labs.lab1.models.RangeConditionsInfo;
 import com.labs.lab1.entities.transaction.WithdrawTransaction;
-import com.labs.lab1.services.TimeMachineService;
+import com.labs.lab1.services.implementations.AccountsManager;
+import com.labs.lab1.services.implementations.CustomerCreator;
+import com.labs.lab1.services.implementations.TimeMachineService;
 import com.labs.lab1.valueObjects.TransactionState;
 import exceptions.IncorrectArgumentsException;
-import exceptions.NotVerifiedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -19,11 +19,9 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class Lab1ApplicationTests {
-
     CentralBank centralBank;
     Bank testBank;
     Customer testCustomer;
@@ -33,24 +31,23 @@ class Lab1ApplicationTests {
         var savingListConditions = new ArrayList<RangeConditionsInfo>();
         savingListConditions.add(new RangeConditionsInfo(0, 50000, 6));
         savingListConditions.add(new RangeConditionsInfo(50000, 100000000, 11));
-        var bankInfo = new CreateBankDTO("ITMO bank", savingListConditions, 10,
-                110, 7, 50000);
         try {
-            testBank = centralBank.createBank(bankInfo);
+            testBank = centralBank.createBank("ITMO bank", savingListConditions, 10,
+                    110, 7, 50000);
         } catch (IncorrectArgumentsException e) {
             throw new RuntimeException(e);
         }
         try {
-            testCustomer =  testBank.createCustomer(null, null, "Maria", "Chistyakova");
+            testCustomer =  new CustomerCreator(testBank).createCustomer(null, null, "Maria", "Chistyakova");
         } catch (IncorrectArgumentsException e) {
             throw new RuntimeException(e);
         }
     }
     @Test
-    void withdrawIncorrectAmount() throws NotVerifiedException {
+    void withdrawIncorrectAmount() {
         Account account = null;
         try {
-            account = testBank.createSavingsAccount(testCustomer, 5000, 6);
+            account = new AccountsManager(testBank).createSavingsAccount(testCustomer, 5000, 6);
         } catch (IncorrectArgumentsException e) {
             throw new RuntimeException(e);
         }
@@ -63,10 +60,10 @@ class Lab1ApplicationTests {
     }
 
     @Test
-    void withdrawFromCreditAccount() throws NotVerifiedException {
+    void withdrawFromCreditAccount() {
         Account account = null;
         try {
-            account = testBank.createCreditAccount(testCustomer, 50000); //commandInvoker.Consume(new CreateCreditCommand(testCustommer, 50000);
+            account = new AccountsManager(testBank).createCreditAccount(testCustomer, 50000); //commandInvoker.Consume(new CreateCreditCommand(testCustommer, 50000);
         } catch (IncorrectArgumentsException e) {
             throw new RuntimeException(e);
         }
@@ -76,10 +73,10 @@ class Lab1ApplicationTests {
     }
 
     @Test
-    void undoReplenish() throws NotVerifiedException {
+    void undoReplenish() {
         Account account = null;
         try {
-            account = testBank.createCreditAccount(testCustomer, 50000); //commandInvoker.Consume(new CreateCreditCommand(testCustommer, 50000);
+            account = new AccountsManager(testBank).createCreditAccount(testCustomer, 50000); //commandInvoker.Consume(new CreateCreditCommand(testCustommer, 50000);
         } catch (IncorrectArgumentsException e) {
             throw new RuntimeException(e);
         }
@@ -94,7 +91,7 @@ class Lab1ApplicationTests {
     void timeServiceTest() {
         Account account = null;
         try {
-            account = testBank.createSavingsAccount(testCustomer, 5000, 2);
+            account = new AccountsManager(testBank).createSavingsAccount(testCustomer, 5000, 2);
         } catch (IncorrectArgumentsException e) {
             throw new RuntimeException(e);
         }
@@ -107,7 +104,7 @@ class Lab1ApplicationTests {
     void creditLimitTest() {
         Account account = null;
         try {
-            account = testBank.createCreditAccount(testCustomer, 50000);
+            account = new AccountsManager(testBank).createCreditAccount(testCustomer, 50000);
         } catch (IncorrectArgumentsException e) {
             throw new RuntimeException(e);
         }
@@ -121,7 +118,7 @@ class Lab1ApplicationTests {
     void notVerifiedExceptionTesting() {
         Account account = null;
         try {
-            account = testBank.createCreditAccount(testCustomer, 500000);
+            account = new AccountsManager(testBank).createCreditAccount(testCustomer, 500000);
         } catch (IncorrectArgumentsException e) {
             throw new RuntimeException(e);
         }
@@ -139,7 +136,7 @@ class Lab1ApplicationTests {
         Mockito.when(customer.getId()).thenReturn(UUID.randomUUID());
         // creating account
         try {
-            testBank.createCreditAccount(customer, 50000);
+            new AccountsManager(testBank).createCreditAccount(customer, 50000);
         } catch (IncorrectArgumentsException e) {
             throw new RuntimeException(e);
         }

@@ -1,4 +1,4 @@
-package com.labs.lab1.entities.bank;
+/*package com.labs.lab1.entities.bank;
 import com.labs.lab1.models.RangeConditionsInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,4 +15,4 @@ public class CreateBankDTO {
     private double baseCommission;
     private double loanRate;
     private double notVerifiedLimit;
-}
+}*/
