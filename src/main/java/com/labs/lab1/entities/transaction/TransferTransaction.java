@@ -29,6 +29,11 @@ public class TransferTransaction extends Transaction {
         this.backUpWithDrawAccountBalance = withdrawAccount.getBalance();
         this.backUpReplenishAccountBalance = replenishAccount.getBalance();
     }
+
+    /**
+     * transfer transaction execution
+     * @param bank bank which operates the transaction (or sends requests to another)
+     */
     @Override
     public void execute(Bank bank) {
         if (withdrawAccount.getBankId() != replenishAccount.getBankId()){
@@ -54,6 +59,9 @@ public class TransferTransaction extends Transaction {
         withdrawedAmount = backUpWithDrawAccountBalance - withdrawAccount.getBalance();
         replenishedAmount = backUpReplenishAccountBalance - replenishAccount.getBalance();
     }
+    /**
+     * rollback of transaction
+     */
     @Override
     public void undo() {
         if (this.state == TransactionState.Rollback) return;

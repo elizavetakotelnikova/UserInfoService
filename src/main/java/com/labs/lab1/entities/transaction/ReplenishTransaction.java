@@ -19,6 +19,11 @@ public class ReplenishTransaction extends Transaction {
         this.amount = amount;
         this.backUpAccountBalance = account.getBalance();
     }
+
+    /**
+     * replenish transaction execution
+     * @param bank bank which provides the transaction
+     */
     @Override
     public void execute(Bank bank) {
         try {
@@ -35,6 +40,9 @@ public class ReplenishTransaction extends Transaction {
     public void backUp() {
         replenishedAmount = account.getBalance() - backUpAccountBalance;
     }
+    /**
+     * rollback of transaction
+     */
     @Override
     public void undo() {
         if (this.state == TransactionState.Rollback) return;

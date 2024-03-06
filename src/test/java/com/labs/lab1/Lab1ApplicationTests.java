@@ -96,8 +96,8 @@ class Lab1ApplicationTests {
             throw new RuntimeException(e);
         }
         var timeService = new TimeMachineService();
-        var speededUpAccount = timeService.speedUpTime(account, 2);
-        assert(speededUpAccount.getBalance() == 5618);
+        timeService.speedUpTime(account, 2);
+        assert(account.getBalance() == 5618);
     }
 
     @Test

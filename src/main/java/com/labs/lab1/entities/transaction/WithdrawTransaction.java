@@ -22,6 +22,11 @@ public class WithdrawTransaction extends Transaction {
         this.amount = amount;
         this.backUpAccountBalance = account.getBalance();
     }
+
+    /**
+     * withdraw transaction execution
+     * @param bank bank which provides the transaction
+     */
     @Override
     public void execute(Bank bank) {
         try {
@@ -40,6 +45,10 @@ public class WithdrawTransaction extends Transaction {
     public void backUp() {
         withdrewAmount = backUpAccountBalance - account.getBalance();
     }
+
+    /**
+     * rollback of transaction
+     */
     @Override
     public void undo() {
         if (state == TransactionState.Rollback) return;

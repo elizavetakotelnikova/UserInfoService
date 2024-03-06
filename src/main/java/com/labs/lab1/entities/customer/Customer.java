@@ -34,6 +34,11 @@ public class Customer implements NotificationGetable {
         // send to user via api
     }
 
+    /**
+     * checking if user has verified account
+     * @return true if customer is verificated
+     */
+
     public boolean checkVerification() {
         return passportData != null && address != null;
     }
