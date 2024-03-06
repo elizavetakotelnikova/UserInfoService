@@ -41,7 +41,7 @@ public class AccountsManager {
     }
     /**
      * creating checking account
-     * @param customer
+     * @param customer customer
      * @return new checking account
      */
     public Account createCheckingAccount(Customer customer) {
@@ -55,7 +55,7 @@ public class AccountsManager {
     }
     /**
      * find conditions for saving account based on range
-     * @param amount
+     * @param amount amount of money
      * @return range and percentage for given amount of money
      */
     public RangeConditionsInfo findConditions(double amount) {
@@ -65,10 +65,10 @@ public class AccountsManager {
     }
     /**
      * creating savings account
-     * @param customer
-     * @param amount
-     * @param monthsQuantity
-     * @return
+     * @param customer customer
+     * @param amount amount of money
+     * @param monthsQuantity months quantity
+     * @return created account
      * @throws IncorrectArgumentsException when months quantity or amount is not set
      */
     public Account createSavingsAccount(Customer customer, double amount, int monthsQuantity) throws IncorrectArgumentsException {

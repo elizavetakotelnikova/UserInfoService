@@ -1,6 +1,9 @@
 package com.labs.lab1.services.implementations;
 import com.labs.lab1.services.interfaces.Updatable;
 
+/**
+ * service for speeding up time and see updates
+ */
 public class TimeMachineService {
     /**
      * updates account based on provided months quantity

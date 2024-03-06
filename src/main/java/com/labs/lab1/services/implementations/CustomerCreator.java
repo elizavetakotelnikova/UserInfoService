@@ -15,10 +15,10 @@ public class CustomerCreator implements CustomerCreatable {
     private Bank bank;
     /**
      * creating customer and adding to customers list
-     * @param address
-     * @param passportData
-     * @param firstName
-     * @param lastName
+     * @param address address
+     * @param passportData passport data
+     * @param firstName firstname
+     * @param lastName lastname
      * @return new customer
      * @throws IncorrectArgumentsException when first name or last name is not set
      */
