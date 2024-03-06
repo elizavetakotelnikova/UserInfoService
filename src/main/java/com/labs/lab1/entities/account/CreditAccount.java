@@ -20,7 +20,7 @@ public class CreditAccount extends Account implements Updatable {
      * @param bankId - bank id
      * @param balance - current account balance
      * @param state - account state (verified/not verified)
-     * @param commissionRate - withdraw/replenish commission when balance less than 0 (in rubles)
+     * @param commissionRate - withdraw/replenish commission when balance < 0 (in rubles)
      * @param limit - credit limit
      * @param loanRate - credit percentage
      */
@@ -56,6 +56,7 @@ public class CreditAccount extends Account implements Updatable {
      * withdrawingmoney
      * @param amount - amount of money
      * @throws NotEnoughMoneyException - not enough money to withdraw or credit limit is fully used
+     * @throws NotVerifiedException - trying to withdraw amount more than not verified limit
      */
     @Override
     public void withdraw(double amount) throws NotEnoughMoneyException {

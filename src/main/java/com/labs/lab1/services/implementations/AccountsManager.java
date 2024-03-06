@@ -36,17 +36,12 @@ public class AccountsManager {
         bank.getAccounts().add(createdAccount);
         return createdAccount;
     }
-
-    /**
-     * checking if customers' accounts could be called verified
-     * @param customer customer
-     */
     public void checkAccountsVerification(Customer customer) {
         if (customer.checkVerification()) bank.getAccounts().stream().filter(x -> x.getUserId() == customer.getId()).forEach(x -> x.setState(AccountState.Verified));
     }
     /**
      * creating checking account
-     * @param customer customer
+     * @param customer
      * @return new checking account
      */
     public Account createCheckingAccount(Customer customer) {
@@ -60,7 +55,7 @@ public class AccountsManager {
     }
     /**
      * find conditions for saving account based on range
-     * @param amount amount of money
+     * @param amount
      * @return range and percentage for given amount of money
      */
     public RangeConditionsInfo findConditions(double amount) {
@@ -70,10 +65,10 @@ public class AccountsManager {
     }
     /**
      * creating savings account
-     * @param customer customer
-     * @param amount amount of money
-     * @param monthsQuantity months quantity
-     * @return created account
+     * @param customer
+     * @param amount
+     * @param monthsQuantity
+     * @return
      * @throws IncorrectArgumentsException when months quantity or amount is not set
      */
     public Account createSavingsAccount(Customer customer, double amount, int monthsQuantity) throws IncorrectArgumentsException {
