@@ -9,9 +9,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CatsRepositoryImpl implements CatsRepository{
+public class CatsDaoImpl implements CatsDao {
     private static SessionFactory factory;
-    public CatsRepositoryImpl() {
+    public CatsDaoImpl() {
         try {
             factory = new Configuration().configure().buildSessionFactory();
         } catch (Throwable ex) {
@@ -20,7 +20,7 @@ public class CatsRepositoryImpl implements CatsRepository{
     }
 
     @Override
-    public Cat create(Cat cat) {
+    public Cat save(Cat cat) {
         try (Session session = factory.openSession()) {
             Transaction tx = session.beginTransaction();
             session.persist(cat);
@@ -44,7 +44,12 @@ public class CatsRepositoryImpl implements CatsRepository{
     }
 
     @Override
-    public Cat getById(long id) {
+    public List<Cat> getAll() {
+        return null;
+    }
+
+    @Override
+    public Cat findById(long id) {
         try (Session session = factory.openSession()) {
             var cat = (Cat) session.get(Cat.class, id);
             if (cat == null) throw new QueryException("No such cat");
@@ -58,7 +63,7 @@ public class CatsRepositoryImpl implements CatsRepository{
     }
 
     @Override
-    public List<Cat> getByCriteria(FindCriteria criteria) {
+    public List<Cat> findByCriteria(FindCriteria criteria) {
         if (criteria.getBirthday() != null) return getByBirthday(criteria.getBirthday());
         if (criteria.getName() != null) return getByName(criteria.getName());
         if (criteria.getBreed() != null) return getByBreed(criteria.getBreed());
@@ -127,10 +132,10 @@ public class CatsRepositoryImpl implements CatsRepository{
     }
 
     @Override
-    public void delete(Cat cat) {
+    public void deleteById(long id) {
         try (Session session = factory.openSession()) {
             Transaction tx = session.beginTransaction();
-            //Cat cat = (Cat)session.get(Cat.class, id);
+            Cat cat = (Cat)session.get(Cat.class, id);
             session.remove(cat);
             tx.commit();
         } catch (Exception e) {

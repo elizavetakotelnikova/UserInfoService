@@ -7,9 +7,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OwnersRepositoryImpl implements OwnersRepository {
+public class OwnersDaoImpl implements OwnersDao {
     private static SessionFactory factory;
-    public OwnersRepositoryImpl() {
+    public OwnersDaoImpl() {
         try {
             factory = new Configuration().configure().buildSessionFactory();
         } catch (Throwable ex) {
@@ -76,10 +76,10 @@ public class OwnersRepositoryImpl implements OwnersRepository {
     }
 
     @Override
-    public void delete(Owner owner) {
+    public void delete(long id) {
         try (Session session = factory.openSession()) {
             Transaction tx = session.beginTransaction();
-            //Owner owner = (Owner)session.get(Owner.class, id);
+            Owner owner = (Owner)session.get(Owner.class, id);
             session.remove(owner);
             tx.commit();
         } catch (Exception e) {
