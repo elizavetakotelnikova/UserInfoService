@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+  postgres:
+    container_name: techlabs
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=techlabs
+    ports:
+      - "7777:5432"
+    restart: unless-stopped
