@@ -135,7 +135,7 @@ public class CatsDaoImpl implements CatsDao {
     public void deleteById(long id) {
         try (Session session = factory.openSession()) {
             Transaction tx = session.beginTransaction();
-            Cat cat = (Cat)session.get(Cat.class, id);
+            Cat cat = session.get(Cat.class, id);
             session.remove(cat);
             tx.commit();
         } catch (Exception e) {

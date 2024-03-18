@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.Color;
 import org.example.ColorConverter;
-import org.example.PostgreSQLEnumType;
 import org.example.entities.owner.Owner;
-import org.hibernate.annotations.Type;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.LocalDate;
 import java.util.List;

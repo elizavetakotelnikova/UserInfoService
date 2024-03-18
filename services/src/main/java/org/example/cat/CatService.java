@@ -1,0 +1,17 @@
+package org.example.cat;
+
+import org.example.cat.catSavingDto;
+import org.example.entities.cat.Cat;
+import org.example.entities.cat.FindCriteria;
+import org.example.exceptions.IncorrectArgumentsException;
+
+import java.util.List;
+
+public interface CatService {
+    Cat saveCat(catSavingDto dto) throws IncorrectArgumentsException;
+    //boolean checkIfCatsAreFriends(long firstId, long secondId);
+    List<Cat> getCatByCriteria(FindCriteria criteria);
+    Cat getCatById(long id);
+    void friendCats(long firstId, long secondId);
+    void delete(long id);
+}

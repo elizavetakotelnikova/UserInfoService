@@ -18,7 +18,7 @@ public class OwnersDaoImpl implements OwnersDao {
     }
 
     @Override
-    public Owner create(Owner owner) {
+    public Owner save(Owner owner) {
         try (Session session = factory.openSession()) {
             Transaction tx = session.beginTransaction();
             session.persist(owner);
@@ -42,7 +42,7 @@ public class OwnersDaoImpl implements OwnersDao {
     }
 
     @Override
-    public Owner getById(long id) {
+    public Owner findById(long id) {
         try (Session session = factory.openSession()) {
             var owner = (Owner) session.get(Owner.class, id);
             if (owner == null) throw new QueryException("No such owner");
@@ -56,7 +56,7 @@ public class OwnersDaoImpl implements OwnersDao {
     }
 
     @Override
-    public List<Owner> getByCriteria(FindCriteria criteria) {
+    public List<Owner> findByCriteria(FindCriteria criteria) {
         if (criteria.getBirthday() != null) return getByBirthday(criteria.getBirthday());
         return new ArrayList<>();
     }
