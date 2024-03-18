@@ -1,11 +1,15 @@
 package org.example.cat;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.example.Color;
 
 import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class catSavingDto {
     private String name;
     private String breed;

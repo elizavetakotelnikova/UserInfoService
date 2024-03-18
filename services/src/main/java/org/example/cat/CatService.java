@@ -1,6 +1,5 @@
 package org.example.cat;
 
-import org.example.cat.catSavingDto;
 import org.example.entities.cat.Cat;
 import org.example.entities.cat.FindCriteria;
 import org.example.exceptions.IncorrectArgumentsException;
@@ -12,6 +11,5 @@ public interface CatService {
     //boolean checkIfCatsAreFriends(long firstId, long secondId);
     List<Cat> getCatByCriteria(FindCriteria criteria);
     Cat getCatById(long id);
-    void friendCats(long firstId, long secondId);
     void delete(long id);
 }

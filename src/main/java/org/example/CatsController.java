@@ -2,6 +2,7 @@ package org.example;
 
 import lombok.AllArgsConstructor;
 import org.example.cat.CatService;
+import org.example.cat.FriendUsecases;
 import org.example.cat.catSavingDto;
 import org.example.entities.cat.Cat;
 import org.example.entities.cat.FindCriteria;
@@ -12,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CatsController {
     private CatService service;
+    private FriendUsecases friendUsecases;
     public Cat getCatById(long id) {
         return service.getCatById(id);
     }
@@ -28,3 +30,4 @@ public class CatsController {
         service.delete(id);
     }
 }
+

@@ -44,6 +44,24 @@ class CatsDaoTests {
         catsDao.deleteById(savedCat.getId());
     }
     @Test
+    void saveCatWithFriends() {
+        ownersDao.save(testOwner);
+        var secondTestCat = new Cat("Tina", "British shorthair", Color.GREY,
+                testOwner, LocalDate.parse("2017-09-04"), new ArrayList<>());
+        var savedCat = catsDao.save(testCat);
+        secondTestCat.getFriends().add(testCat);
+        var secondSavedCat = catsDao.save(secondTestCat);
+        testCat.getFriends().add(secondTestCat);
+        catsDao.update(savedCat);
+        assert(savedCat.getId() != null);
+        Cat foundCat = catsDao.findById(savedCat.getId());
+        Cat foundSecondCat = catsDao.findById(secondSavedCat.getId());
+        assert(foundSecondCat.getFriends().getFirst().getId().equals(testCat.getId()));
+        assert(foundCat.getFriends().getFirst().getId().equals(secondSavedCat.getId()));
+        catsDao.deleteById(savedCat.getId());
+        catsDao.deleteById(secondSavedCat.getId());
+    }
+    @Test
     void findCatByCriteria() {
         ownersDao.save(testOwner);
         var savedCat = catsDao.save(testCat);

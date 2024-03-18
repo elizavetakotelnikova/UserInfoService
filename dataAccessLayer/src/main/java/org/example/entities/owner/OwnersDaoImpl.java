@@ -1,4 +1,5 @@
 package org.example.entities.owner;
+import org.example.entities.cat.Cat;
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
@@ -19,31 +20,43 @@ public class OwnersDaoImpl implements OwnersDao {
 
     @Override
     public Owner save(Owner owner) {
-        try (Session session = factory.openSession()) {
+        Session session = null;
+        try {
+            session = factory.openSession();
             Transaction tx = session.beginTransaction();
             session.persist(owner);
             tx.commit();
         } catch (HibernateException e) {
             throw new RuntimeException(e.getMessage());
         }
+        finally {
+            if (session != null) session.close();
+        }
         return owner;
     }
 
     @Override
     public Owner update(Owner owner) {
-        try (Session session = factory.openSession()) {
+        Session session = null;
+        try {
+            session = factory.openSession();
             Transaction tx = session.beginTransaction();
             session.update(owner);
             tx.commit();
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
+        finally {
+            if (session != null) session.close();
+        }
         return owner;
     }
 
     @Override
     public Owner findById(long id) {
-        try (Session session = factory.openSession()) {
+        Session session = null;
+        try {
+            session = factory.openSession();
             var owner = (Owner) session.get(Owner.class, id);
             if (owner == null) throw new QueryException("No such owner");
             return owner;
@@ -53,6 +66,9 @@ public class OwnersDaoImpl implements OwnersDao {
         catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
+        finally {
+            if (session != null) session.close();
+        }
     }
 
     @Override
@@ -61,7 +77,9 @@ public class OwnersDaoImpl implements OwnersDao {
         return new ArrayList<>();
     }
     public List<Owner> getByBirthday(LocalDate date) {
-        try (Session session = factory.openSession()) {
+        Session session = null;
+        try {
+            session = factory.openSession();
             Query query = session.createQuery("SELECT owner from Owner owner where owner.birthday = :date");
             query.setParameter("date", date);
             var cats = query.list();
@@ -73,17 +91,44 @@ public class OwnersDaoImpl implements OwnersDao {
         catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
+        finally {
+            if (session != null) session.close();
+        }
     }
 
     @Override
     public void delete(long id) {
-        try (Session session = factory.openSession()) {
+        Session session = null;
+        try {
+            session = factory.openSession();
             Transaction tx = session.beginTransaction();
             Owner owner = (Owner)session.get(Owner.class, id);
             session.remove(owner);
             tx.commit();
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
+        }
+        finally {
+            if (session != null) session.close();
+        }
+    }
+    @Override
+    public List<Owner> findAll() {
+        Session session = null;
+        try {
+            session = factory.openSession();
+            Query query = session.createQuery("SELECT owner from Owner owner");
+            var owners = query.list();
+            if (owners == null) throw new QueryException("No such owners");
+            return owners;
+        } catch (QueryException e) {
+            return null;
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+        finally {
+            if (session != null) session.close();
         }
     }
 }

@@ -1,5 +1,7 @@
 package org.example.entities.cat;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
 import org.example.Color;
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
@@ -21,36 +23,63 @@ public class CatsDaoImpl implements CatsDao {
 
     @Override
     public Cat save(Cat cat) {
-        try (Session session = factory.openSession()) {
+        Session session = null;
+        try {
+            session = factory.openSession();
             Transaction tx = session.beginTransaction();
             session.persist(cat);
             tx.commit();
         } catch (HibernateException e) {
             throw new RuntimeException(e.getMessage());
         }
+        finally {
+            if (session != null) session.close();
+        }
         return cat;
     }
 
     @Override
     public Cat update(Cat cat) {
-        try (Session session = factory.openSession()) {
+        Session session = null;
+        try {
+            session = factory.openSession();
             Transaction tx = session.beginTransaction();
             session.update(cat);
             tx.commit();
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
+        finally {
+            if (session != null) session.close();
+        }
         return cat;
     }
 
     @Override
     public List<Cat> getAll() {
-        return null;
+        Session session = null;
+        try {
+            session = factory.openSession();
+            Query query = session.createQuery("SELECT cat from Cat cat");
+            var cats = query.list();
+            if (cats == null) throw new QueryException("No such cats");
+            return cats;
+        } catch (QueryException e) {
+            return null;
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+        finally {
+            if (session != null) session.close();
+        }
     }
 
     @Override
     public Cat findById(long id) {
-        try (Session session = factory.openSession()) {
+        Session session = null;
+        try {
+            session = factory.openSession();
             var cat = (Cat) session.get(Cat.class, id);
             if (cat == null) throw new QueryException("No such cat");
             return cat;
@@ -59,6 +88,9 @@ public class CatsDaoImpl implements CatsDao {
         }
         catch (Exception e) {
             throw new RuntimeException(e.getMessage());
+        }
+        finally {
+            if (session != null) session.close();
         }
     }
 
@@ -72,7 +104,9 @@ public class CatsDaoImpl implements CatsDao {
     }
 
     public List<Cat> getByName(String name) {
-        try (Session session = factory.openSession()) {
+        Session session = null;
+        try {
+            session = factory.openSession();
             Query query = session.createQuery("SELECT cat from Cat cat where cat.name = :name");
             query.setParameter("name", name);
             var cats = query.list();
@@ -84,10 +118,15 @@ public class CatsDaoImpl implements CatsDao {
         catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
+        finally {
+            if (session != null) session.close();
+        }
     }
 
     public List<Cat> getByBirthday(LocalDate date) {
-        try (Session session = factory.openSession()) {
+        Session session = null;
+        try {
+            session = factory.openSession();
             Query query = session.createQuery("SELECT cat from Cat cat where cat.birthday = :date");
             query.setParameter("date", date);
             var cats = query.list();
@@ -99,10 +138,15 @@ public class CatsDaoImpl implements CatsDao {
         catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
+        finally {
+            if (session != null) session.close();
+        }
     }
 
     public List<Cat> getByColor(Color color) {
-        try (Session session = factory.openSession()) {
+        Session session = null;
+        try {
+            session = factory.openSession();
             Query query = session.createQuery("SELECT cat from Cat cat where cat.color = :color");
             query.setParameter("color", color);
             var cats = query.list();
@@ -114,10 +158,15 @@ public class CatsDaoImpl implements CatsDao {
         catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
+        finally {
+            if (session != null) session.close();
+        }
     }
 
     public List<Cat> getByBreed(String breed) {
-        try (Session session = factory.openSession()) {
+        Session session = null;
+        try {
+            session = factory.openSession();
             Query query = session.createQuery("SELECT cat from Cat cat where cat.breed = :breed");
             query.setParameter("breed", breed);
             var cats = query.list();
@@ -129,17 +178,28 @@ public class CatsDaoImpl implements CatsDao {
         catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
+        finally {
+            if (session != null) session.close();
+        }
     }
 
     @Override
     public void deleteById(long id) {
-        try (Session session = factory.openSession()) {
+        Session session = null;
+        try {
+            session = factory.openSession();
             Transaction tx = session.beginTransaction();
             Cat cat = session.get(Cat.class, id);
+            for (Cat each : cat.getFriends()) {
+                each.getFriends().remove(cat);
+            }
             session.remove(cat);
             tx.commit();
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
+        }
+        finally {
+            if (session != null) session.close();
         }
     }
 }

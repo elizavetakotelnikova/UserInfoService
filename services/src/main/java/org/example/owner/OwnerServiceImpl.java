@@ -34,14 +34,6 @@ public class OwnerServiceImpl implements OwnerService {
     public Owner update(Owner owner) {
         return ownersDao.update(owner);
     }
-
-    @Override
-    public void addCat(long ownerId, long catId) {
-        var owner = ownersDao.findById(ownerId);
-        var cat = catsDao.findById(catId);
-        owner.getCats().add(cat);
-        ownersDao.update(owner);
-    }
     @Override
     public void delete(long id) {
         catsDao.deleteById(id);

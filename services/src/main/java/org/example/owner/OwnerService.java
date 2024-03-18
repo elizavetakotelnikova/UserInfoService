@@ -11,6 +11,5 @@ public interface OwnerService {
     List<Owner> getOwnerByCriteria(FindCriteria criteria);
     Owner getOwnerById(long id);
     Owner update(Owner owner);
-    void addCat(long ownerId, long catId);
     void delete(long id);
 }
