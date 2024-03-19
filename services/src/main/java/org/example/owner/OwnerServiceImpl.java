@@ -36,6 +36,6 @@ public class OwnerServiceImpl implements OwnerService {
     }
     @Override
     public void delete(long id) {
-        catsDao.deleteById(id);
+        ownersDao.delete(id);
     }
 }

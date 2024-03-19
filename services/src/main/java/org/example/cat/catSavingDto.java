@@ -3,7 +3,7 @@ package org.example.cat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.Color;
+import org.example.valueObjects.Color;
 
 import java.util.List;
 

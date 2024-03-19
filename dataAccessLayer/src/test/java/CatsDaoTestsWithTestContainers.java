@@ -6,20 +6,61 @@ import org.example.entities.cat.FindCriteria;
 import org.example.entities.owner.Owner;
 import org.example.entities.owner.OwnersDao;
 import org.example.entities.owner.OwnersDaoImpl;
+import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.PostgreSQLContainer;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
-class CatsDaoTests {
+class CatsDaoTestsWithTestContainers {
     Cat testCat;
     Owner testOwner;
     CatsDao catsDao;
     OwnersDao ownersDao;
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
+            "postgres:15-alpine"
+    );
+
+    @BeforeAll
+    static void beforeAll() {
+        postgres.start();
+    }
+
+    @AfterAll
+    static void afterAll() {
+        postgres.stop();
+    }
+
+    @BeforeEach
+    void setUp() throws SQLException {
+        Connection connectionProvider = DriverManager.getConnection(
+                postgres.getJdbcUrl(),
+                postgres.getUsername(),
+                postgres.getPassword()
+        );
+        var flyaway = setupFlyway(postgres);
+        flyaway.clean();
+        flyaway.migrate();
+    }
+    private Flyway setupFlyway(PostgreSQLContainer container) {
+        return new Flyway(
+                Flyway.configure()
+                        .locations("/db.migration")
+                        .dataSource(container.getJdbcUrl(), container.getUsername(),
+                                container.getPassword())
+        );
+    }
     @BeforeEach
     void setUpEntities() {
         testOwner = new Owner(LocalDate.parse("2004-12-12"), new ArrayList<>());
@@ -41,6 +82,7 @@ class CatsDaoTests {
         assertIterableEquals(savedCat.getFriends(), foundCat.getFriends());
         assertEquals(savedCat.getColor(), foundCat.getColor());
         assertEquals(savedCat.getOwner().getId(), foundCat.getOwner().getId());
+        catsDao.deleteById(savedCat.getId());
     }
     @Test
     void saveCatWithFriends() {
@@ -57,6 +99,8 @@ class CatsDaoTests {
         Cat foundSecondCat = catsDao.findById(secondSavedCat.getId());
         assert(foundSecondCat.getFriends().getFirst().getId().equals(testCat.getId()));
         assert(foundCat.getFriends().getFirst().getId().equals(secondSavedCat.getId()));
+        catsDao.deleteById(savedCat.getId());
+        catsDao.deleteById(secondSavedCat.getId());
     }
     @Test
     void findCatByCriteria() {
@@ -77,5 +121,8 @@ class CatsDaoTests {
         assert(!foundIds.contains(thirdSavedCat.getId()));
         assert(foundIds.contains(savedCat.getId()));
         assert(foundIds.contains(secondSavedCat.getId()));
+        catsDao.deleteById(savedCat.getId());
+        catsDao.deleteById(secondSavedCat.getId());
+        catsDao.deleteById(thirdSavedCat.getId());
     }
 }

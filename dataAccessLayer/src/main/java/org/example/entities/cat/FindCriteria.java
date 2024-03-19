@@ -1,7 +1,7 @@
 package org.example.entities.cat;
 
 import lombok.Data;
-import org.example.Color;
+import org.example.valueObjects.Color;
 import org.jetbrains.annotations.Nullable;
 
 @Data

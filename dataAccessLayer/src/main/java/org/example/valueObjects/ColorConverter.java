@@ -1,6 +1,7 @@
-package org.example;
+package org.example.valueObjects;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+import org.example.valueObjects.Color;
 
 @Converter(autoApply = true)
 public class ColorConverter implements AttributeConverter<Color, String> {

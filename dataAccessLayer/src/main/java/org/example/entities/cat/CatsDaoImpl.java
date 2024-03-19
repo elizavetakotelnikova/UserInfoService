@@ -1,8 +1,6 @@
 package org.example.entities.cat;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import org.example.Color;
+import org.example.valueObjects.Color;
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;

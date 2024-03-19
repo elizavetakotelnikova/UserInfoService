@@ -5,9 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.example.Color;
-import org.example.ColorConverter;
+import org.example.valueObjects.Color;
+import org.example.valueObjects.ColorConverter;
 import org.example.entities.owner.Owner;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,6 +23,7 @@ public class Cat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotNull
     private String name;
     private String breed;
     @Enumerated(EnumType.STRING)

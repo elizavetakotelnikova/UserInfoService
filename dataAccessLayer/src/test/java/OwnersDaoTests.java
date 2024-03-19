@@ -1,5 +1,5 @@
 
-import org.example.Color;
+import org.example.valueObjects.Color;
 import org.example.entities.cat.Cat;
 import org.example.entities.cat.CatsDao;
 import org.example.entities.cat.CatsDaoImpl;

@@ -1,4 +1,4 @@
-import org.example.Color;
+import org.example.valueObjects.Color;
 import org.example.cat.CatServiceImpl;
 import org.example.cat.FriendUsecasesImpl;
 import org.example.cat.catSavingDto;

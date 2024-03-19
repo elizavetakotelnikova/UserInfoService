@@ -1,4 +1,4 @@
-package org.example;
+package org.example.valueObjects;
 
 public enum Color {
     ORANGE,
