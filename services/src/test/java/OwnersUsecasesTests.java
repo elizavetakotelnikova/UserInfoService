@@ -36,21 +36,13 @@ class OwnersUsecasesTests {
         testCat.setOwner(testOwner);
     }
     @Test
-    void saveOwnerUsecase() {
+    void saveOwnerUsecaseTest() {
         var ownerService = new OwnerServiceImpl(catsDao, ownersDao);
-        /*try {
-            var owner = ownerService.saveOwner(new ownerSavingDto(testOwner.getName(), testOwner.getBreed(),
-                    testOwner.getColor(), testOwner.getId(), testOwner.getBirthday(), new ArrayList<>()));
-            verify(ownersDao, times(1)).save(owner);
-        }
-        ownerch (Exception e) {
-            throw new RuntimeException(e);
-        }*/
         Exception exception = assertThrows(IncorrectArgumentsException.class, () -> ownerService.saveOwner(new ownerSavingDto(null, new ArrayList<>())));
         assertEquals(IncorrectArgumentsException.class, exception.getClass());
     }
     @Test
-    void deleteOwnerUsecase() {
+    void deleteOwnerUsecaseTest() {
         var ownerService = new OwnerServiceImpl(catsDao, ownersDao);
         try {
             when(ownersDao.findById(1)).thenReturn(testOwner);
@@ -66,7 +58,7 @@ class OwnersUsecasesTests {
     }
 
     @Test
-    void addCatUsecase() {
+    void addCatUsecaseTest() {
         var ownerService = new OwnerServiceImpl(catsDao, ownersDao);
         var catManagingService = new ManagingCatsUsecasesImpl(ownersDao, catsDao);
         when(ownersDao.findById(1)).thenReturn(testOwner);

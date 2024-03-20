@@ -114,21 +114,15 @@ public class OwnersDaoImpl implements OwnersDao {
     }
     @Override
     public List<Owner> findAll() {
-        Session session = null;
-        try {
-            session = factory.openSession();
+        try (Session session = factory.openSession()) {
             Query query = session.createQuery("SELECT owner from Owner owner");
             var owners = query.list();
             if (owners == null) throw new QueryException("No such owners");
             return owners;
         } catch (QueryException e) {
             return null;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
-        }
-        finally {
-            if (session != null) session.close();
         }
     }
 }
