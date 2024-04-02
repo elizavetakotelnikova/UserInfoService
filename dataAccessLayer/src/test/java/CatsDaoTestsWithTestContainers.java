@@ -1,16 +1,15 @@
 import org.example.valueObjects.Color;
 import org.example.entities.cat.Cat;
 import org.example.entities.cat.CatsDao;
-import org.example.entities.cat.CatsDaoImpl;
 import org.example.entities.cat.FindCriteria;
 import org.example.entities.owner.Owner;
 import org.example.entities.owner.OwnersDao;
-import org.example.entities.owner.OwnersDaoImpl;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.sql.Connection;
@@ -26,7 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 class CatsDaoTestsWithTestContainers {
     Cat testCat;
     Owner testOwner;
+    @Autowired
     CatsDao catsDao;
+    @Autowired
     OwnersDao ownersDao;
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
             "postgres:15-alpine"
@@ -67,15 +68,13 @@ class CatsDaoTestsWithTestContainers {
         testCat = new Cat("Tina", "British shorthair", Color.GREY,
                 testOwner, LocalDate.parse("2017-08-04"), new ArrayList<>());
         testOwner.getCats().add(testCat);
-        catsDao = new CatsDaoImpl();
-        ownersDao = new OwnersDaoImpl();
     }
     @Test
     void saveCat() {
         ownersDao.save(testOwner);
         var savedCat = catsDao.save(testCat);
         assert(savedCat.getId() != null);
-        Cat foundCat = catsDao.findById(savedCat.getId());
+        Cat foundCat = catsDao.findById(savedCat.getId()).get();
         assertEquals(savedCat.getId(), foundCat.getId());
         assertEquals(savedCat.getBirthday(), foundCat.getBirthday());
         assertEquals(savedCat.getBreed(), foundCat.getBreed());
@@ -95,8 +94,8 @@ class CatsDaoTestsWithTestContainers {
         testCat.getFriends().add(secondTestCat);
         catsDao.update(savedCat);
         assert(savedCat.getId() != null);
-        Cat foundCat = catsDao.findById(savedCat.getId());
-        Cat foundSecondCat = catsDao.findById(secondSavedCat.getId());
+        Cat foundCat = catsDao.findById(savedCat.getId()).get();
+        Cat foundSecondCat = catsDao.findById(secondSavedCat.getId()).get();
         assert(foundSecondCat.getFriends().getFirst().getId().equals(testCat.getId()));
         assert(foundCat.getFriends().getFirst().getId().equals(secondSavedCat.getId()));
         catsDao.deleteById(savedCat.getId());

@@ -3,7 +3,7 @@ import org.example.entities.cat.Cat;
 import org.example.entities.cat.CatsDao;
 import org.example.owner.ManagingCatsUsecasesImpl;
 import org.example.owner.OwnerServiceImpl;
-import org.example.owner.ownerSavingDto;
+import org.example.owner.OwnerInfoDto;
 import org.example.entities.owner.Owner;
 import org.example.entities.owner.OwnersDao;
 import org.example.exceptions.IncorrectArgumentsException;
@@ -38,7 +38,7 @@ class OwnersUsecasesTests {
     @Test
     void saveOwnerUsecaseTest() {
         var ownerService = new OwnerServiceImpl(catsDao, ownersDao);
-        Exception exception = assertThrows(IncorrectArgumentsException.class, () -> ownerService.saveOwner(new ownerSavingDto(null, new ArrayList<>())));
+        Exception exception = assertThrows(IncorrectArgumentsException.class, () -> ownerService.saveOwner(new OwnerInfoDto(null, null, new ArrayList<>())));
         assertEquals(IncorrectArgumentsException.class, exception.getClass());
     }
     @Test
@@ -47,7 +47,7 @@ class OwnersUsecasesTests {
         try {
             when(ownersDao.findById(1)).thenReturn(testOwner);
             ownerService.delete(1);
-            verify(ownersDao, times(1)).delete(1);
+            verify(ownersDao, times(1)).deleteById(1);
         }
         catch (Exception e) {
             throw new RuntimeException(e);

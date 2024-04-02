@@ -6,10 +6,10 @@ import org.example.exceptions.IncorrectArgumentsException;
 import java.util.List;
 
 public interface OwnerService {
-    Owner saveOwner(ownerSavingDto dto) throws IncorrectArgumentsException;
+    Owner saveOwner(OwnerInfoDto dto) throws IncorrectArgumentsException;
     //boolean checkIfOwnersAreFriends(long firstId, long secondId);
     List<Owner> getOwnerByCriteria(FindCriteria criteria);
     Owner getOwnerById(long id);
-    Owner update(Owner owner);
+    Owner update(OwnerInfoDto dto) throws IncorrectArgumentsException;
     void delete(long id);
 }

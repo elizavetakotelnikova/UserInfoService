@@ -1,12 +1,16 @@
 package org.example.cat;
-
-import lombok.AllArgsConstructor;
 import org.example.entities.cat.Cat;
 import org.example.entities.cat.CatsDao;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-@AllArgsConstructor
+@Service
 public class FriendUsecasesImpl implements FriendUsecases{
     CatsDao catsDao;
+    @Autowired
+    public FriendUsecasesImpl(CatsDao catsDao) {
+        this.catsDao = catsDao;
+    }
     @Override
     public void friendCats(long firstId, long secondId) {
         if (checkIfCatsAreFriends(firstId, secondId)) return;
@@ -14,8 +18,8 @@ public class FriendUsecasesImpl implements FriendUsecases{
         var secondCat = catsDao.findById(secondId);
         firstCat.getFriends().add(secondCat);
         secondCat.getFriends().add(firstCat);
-        catsDao.update(firstCat);
-        catsDao.update(secondCat);
+        catsDao.save(firstCat);
+        catsDao.save(secondCat);
     }
 
     @Override
@@ -25,8 +29,8 @@ public class FriendUsecasesImpl implements FriendUsecases{
         var secondCat = catsDao.findById(secondId);
         firstCat.getFriends().remove(secondCat);
         secondCat.getFriends().remove(firstCat);
-        catsDao.update(firstCat);
-        catsDao.update(secondCat);
+        catsDao.save(firstCat);
+        catsDao.save(secondCat);
     }
 
     @Override

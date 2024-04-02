@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class catSavingDto {
+public class CatSaveDto {
     private String name;
     private String breed;
     private Color color;
@@ -18,3 +18,4 @@ public class catSavingDto {
     private java.time.LocalDate birthday;
     private List<Long> friendsId;
 }
+

@@ -1,13 +1,16 @@
-package org.example.entities.owner;
+package org.example.owner.responseModels;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FindCriteria {
-    @Nullable
+public class OwnerCreateResponse {
+    private Long id;
     private java.time.LocalDate birthday;
+    private List<Long> cats;
 }

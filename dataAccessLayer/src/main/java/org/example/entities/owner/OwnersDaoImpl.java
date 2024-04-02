@@ -1,4 +1,4 @@
-package org.example.entities.owner;
+/*package org.example.entities.owner;
 import org.example.entities.cat.Cat;
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
@@ -125,5 +125,5 @@ public class OwnersDaoImpl implements OwnersDao {
             throw new RuntimeException(e.getMessage());
         }
     }
-}
+}*/
 

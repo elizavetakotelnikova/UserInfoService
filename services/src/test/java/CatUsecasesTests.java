@@ -1,7 +1,7 @@
 import org.example.valueObjects.Color;
 import org.example.cat.CatServiceImpl;
 import org.example.cat.FriendUsecasesImpl;
-import org.example.cat.catSavingDto;
+import org.example.cat.CatInfoDto;
 import org.example.entities.cat.Cat;
 import org.example.entities.cat.CatsDao;
 import org.example.entities.owner.Owner;
@@ -46,7 +46,7 @@ class CatUsecasesTests {
         catch (Exception e) {
             throw new RuntimeException(e);
         }*/
-        Exception exception = assertThrows(IncorrectArgumentsException.class, () -> catService.saveCat(new catSavingDto(null, testCat.getBreed(),
+        Exception exception = assertThrows(IncorrectArgumentsException.class, () -> catService.saveCat(new CatInfoDto(null, testCat.getBreed(),
                 testCat.getColor(), testCat.getId(), testCat.getBirthday(), new ArrayList<>())));
         assertEquals(IncorrectArgumentsException.class, exception.getClass());
     }

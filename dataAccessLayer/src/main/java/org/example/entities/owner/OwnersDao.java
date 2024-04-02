@@ -1,12 +1,23 @@
 package org.example.entities.owner;
 
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDate;
 import java.util.List;
 
-public interface OwnersDao {
-    Owner save(Owner owner);
-    Owner update(Owner owner);
-    List<Owner> findAll();
+@Repository
+public interface OwnersDao extends JpaRepository<Owner, Long> {
+    @NotNull Owner save(Owner owner);
+    /*@Modifying
+    @Query("update Owner o set o.birthday = ?1, o.cats = ?2")
+    Owner update(Owner owner);*/
+    @NotNull List<Owner> findAll();
     Owner findById(long id);
-    List<Owner> findByCriteria(FindCriteria criteria);
-    void delete(long id);
+    List<Owner> findByBirthday(LocalDate birthday);
+    //List<Owner> findByCriteria(FindCriteria criteria);
+    void deleteById(long id);
 }
