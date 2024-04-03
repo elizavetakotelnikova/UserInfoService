@@ -1,4 +1,4 @@
-package org.example.cat.responseModels;
+package org.example.cat.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

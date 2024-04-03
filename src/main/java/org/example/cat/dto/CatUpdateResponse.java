@@ -1,10 +1,8 @@
-package org.example.cat.responseModels;
+package org.example.cat.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.entities.cat.Cat;
-import org.example.entities.owner.Owner;
 import org.example.valueObjects.Color;
 
 import java.util.List;
@@ -12,7 +10,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CatCreateResponse {
+public class CatUpdateResponse {
     private Long id;
     private String name;
     private String breed;

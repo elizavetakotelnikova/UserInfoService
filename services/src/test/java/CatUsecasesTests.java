@@ -46,8 +46,8 @@ class CatUsecasesTests {
         catch (Exception e) {
             throw new RuntimeException(e);
         }*/
-        Exception exception = assertThrows(IncorrectArgumentsException.class, () -> catService.saveCat(new CatInfoDto(null, testCat.getBreed(),
-                testCat.getColor(), testCat.getId(), testCat.getBirthday(), new ArrayList<>())));
+        Exception exception = assertThrows(IncorrectArgumentsException.class, () -> catService.saveCat(new CatInfoDto(null, testCat.getName(), testCat.getBreed(),
+                testCat.getColor(), testCat.getOwner().getId(), testCat.getBirthday(), new ArrayList<>())));
         assertEquals(IncorrectArgumentsException.class, exception.getClass());
     }
     @Test

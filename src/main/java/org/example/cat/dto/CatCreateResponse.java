@@ -1,4 +1,4 @@
-package org.example.cat;
+package org.example.cat.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,12 +10,12 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CatSaveDto {
+public class CatCreateResponse {
+    private Long id;
     private String name;
     private String breed;
     private Color color;
     private Long ownerId;
     private java.time.LocalDate birthday;
-    private List<Long> friendsId;
+    private List<Long> friends;
 }
-
