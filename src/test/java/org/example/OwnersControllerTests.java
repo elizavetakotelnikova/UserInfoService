@@ -72,12 +72,12 @@ public class OwnersControllerTests {
                 .andExpect(status().isOk());
     }
     @Test
-    public void savingOwnerTest_ShouldReturn500Status() throws Exception {
+    public void savingOwnerTest_ShouldReturn400Status() throws Exception {
         var request = "{\"birthday\" : null}";
         var json = new ObjectMapper().writeValueAsString(request);
         this.mockMvc.perform(post("/owner")
                         .contentType(MediaType.APPLICATION_JSON).content(json))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().is4xxClientError());
     }
     @Test
     public void getOwnerTest_ShouldReturn200Status() throws Exception {
@@ -87,7 +87,7 @@ public class OwnersControllerTests {
                 .andExpect(status().isOk()).andReturn();
     }
     @Test
-    public void getOwnerTest_ShouldReturn500Status() throws Exception {
+    public void getOwnerTest_ShouldReturn400Status() throws Exception {
         MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders.get("/owner/5000")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is5xxServerError()).andReturn();

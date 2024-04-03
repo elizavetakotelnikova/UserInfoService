@@ -64,6 +64,6 @@ class OwnersUsecasesTests {
         when(ownersDao.findById(1)).thenReturn(testOwner);
         catManagingService.addToCatList(testOwner.getId(), testCat.getId());
         assert(testOwner.getCats().contains(testCat));
-        verify(ownersDao, times(1)).update(testOwner);
+        verify(ownersDao, times(1)).save(testOwner);
     }
 }
