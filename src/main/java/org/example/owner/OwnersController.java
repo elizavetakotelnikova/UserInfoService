@@ -1,4 +1,5 @@
 package org.example.owner;
+import lombok.RequiredArgsConstructor;
 import org.example.entities.cat.Cat;
 import org.example.entities.owner.FindCriteria;
 import org.example.entities.owner.Owner;
@@ -16,15 +17,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class OwnersController {
     private final OwnerService service;
     private final ManagingCatsUsecases managingCatsUsecases;
-    @Autowired
-    public OwnersController(OwnerService ownerService, ManagingCatsUsecases managingCatsUsecases) {
-        service = ownerService;
-        this.managingCatsUsecases = managingCatsUsecases;
 
-    }
     @GetMapping("/owner/{ownerId}")
     public ResponseEntity<OwnerCreateResponse> getOwnerById(@PathVariable long ownerId) {
         var returnedOwner = service.getOwnerById(ownerId);
@@ -59,7 +56,7 @@ public class OwnersController {
             returnedOwner = service.update(dto);
         }
         catch (IncorrectArgumentsException e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(new OwnerIdResponse(returnedOwner.getId()),
                 HttpStatus.OK);

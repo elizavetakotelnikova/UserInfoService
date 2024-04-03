@@ -1,4 +1,5 @@
 package org.example.cat;
+import lombok.RequiredArgsConstructor;
 import org.example.cat.dto.CatCreateResponse;
 import org.example.cat.dto.CatIdResponse;
 import org.example.cat.dto.CatSavingRequest;
@@ -16,14 +17,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class CatsController {
     private final CatService service;
     private final FriendUsecases friendUsecases;
-    @Autowired
-    public CatsController(CatService catService, FriendUsecases friendUsecases) {
-        service = catService;
-        this.friendUsecases = friendUsecases;
-    }
     @GetMapping("/cat/{catId}")
     public ResponseEntity<CatCreateResponse> getCatById(@PathVariable long catId) {
         var returnedCat = service.getCatById(catId);
