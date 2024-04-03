@@ -24,7 +24,6 @@ public interface CatsDao extends JpaRepository<Cat, Long> {
     List<Cat> findByColor(Color color);
     List<Cat> findByName(String name);
     List<Cat> findByBreed(String breed);
-    //List<Cat> findByFriends(Long id);
     @NotNull Cat save(@NotNull Cat cat);
     void deleteById(long id);
 }

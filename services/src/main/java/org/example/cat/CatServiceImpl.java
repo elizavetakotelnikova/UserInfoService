@@ -37,6 +37,7 @@ public class CatServiceImpl implements CatService {
     @Override
     public List<Cat> getCatByCriteria(FindCriteria criteria) {
         if (criteria.getColor() != null) return catsDao.findByColor(criteria.getColor());
+        if (criteria.getBirthday() != null) return catsDao.findByBirthday(criteria.getBirthday());
         if (criteria.getName() != null) return catsDao.findByName(criteria.getName());
         if (criteria.getBreed() != null) return catsDao.findByBreed(criteria.getBreed());
         if (criteria.getOwnerId() != null) return catsDao.findByOwnerId(criteria.getOwnerId());
