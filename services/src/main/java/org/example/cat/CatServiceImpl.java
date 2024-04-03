@@ -53,7 +53,7 @@ public class CatServiceImpl implements CatService {
     }
     @Override
     public Cat update(CatInfoDto dto) throws IncorrectArgumentsException {
-        if (dto.getName() != null && dto.getBirthday() != null && dto.getBreed() != null && dto.getOwnerId() != null) {
+        if (dto.getId() != null && dto.getName() != null && dto.getBirthday() != null && dto.getBreed() != null && dto.getOwnerId() != null) {
             var owner = ownersDao.findById(dto.getOwnerId()).stream().findFirst().orElse(null);
             var friends = dto.getFriendsId().stream().map(x -> catsDao.findById(x).stream().findFirst().orElse(null)).toList();
             return catsDao.save(new Cat(dto.getId(), dto.getName(), dto.getBreed(), dto.getColor(), owner, dto.getBirthday(), friends));

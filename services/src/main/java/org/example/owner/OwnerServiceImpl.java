@@ -47,7 +47,7 @@ public class OwnerServiceImpl implements OwnerService {
     }
     @Override
     public Owner update(OwnerInfoDto dto) throws IncorrectArgumentsException {
-        if (dto.getBirthday() != null) {
+        if (dto.getId() != null && dto.getBirthday() != null) {
             var cats = dto.getCats().stream().map(x -> catsDao.findById(x.getId()).get()).toList();
             return ownersDao.save(new Owner(dto.getBirthday(), cats));
         }
