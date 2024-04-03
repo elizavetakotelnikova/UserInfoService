@@ -18,11 +18,13 @@ import java.util.List;
 @RestController
 public class OwnersController {
     private final OwnerService service;
+    private final ManagingCatsUsecases managingCatsUsecases;
     @Autowired
-    public OwnersController(OwnerService ownerService) {
+    public OwnersController(OwnerService ownerService, ManagingCatsUsecases managingCatsUsecases) {
         service = ownerService;
+        this.managingCatsUsecases = managingCatsUsecases;
+
     }
-    //private ManagingCatsUsecases managingCatsUsecases;
     @GetMapping("/owner/{ownerId}")
     public ResponseEntity<OwnerCreateResponse> getOwnerById(@PathVariable long ownerId) {
         var returnedOwner = service.getOwnerById(ownerId);

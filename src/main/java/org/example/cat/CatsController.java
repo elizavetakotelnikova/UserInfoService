@@ -18,11 +18,12 @@ import java.util.List;
 @RestController
 public class CatsController {
     private final CatService service;
+    private final FriendUsecases friendUsecases;
     @Autowired
-    public CatsController(CatService catService) {
+    public CatsController(CatService catService, FriendUsecases friendUsecases) {
         service = catService;
+        this.friendUsecases = friendUsecases;
     }
-    //private FriendUsecases friendUsecases;
     @GetMapping("/cat/{catId}")
     public ResponseEntity<CatCreateResponse> getCatById(@PathVariable long catId) {
         var returnedCat = service.getCatById(catId);
