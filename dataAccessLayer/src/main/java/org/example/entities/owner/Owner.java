@@ -28,8 +28,8 @@ public class Owner {
     @ManyToMany(targetEntity = Role.class, fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_authorities",
-            joinColumns = { @JoinColumn(name = "authority_id") },
-            inverseJoinColumns = { @JoinColumn(name = "user_id") }
+            joinColumns = { @JoinColumn(name = "user_id") },
+            inverseJoinColumns = { @JoinColumn(name = "authority_id") }
     )
     private List<Role> authorities;
     public Owner(LocalDate date, List<Cat> cats) {

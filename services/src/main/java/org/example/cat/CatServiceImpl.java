@@ -5,6 +5,8 @@ import org.example.entities.cat.FindCriteria;
 import org.example.entities.owner.OwnersDao;
 import org.example.exceptions.IncorrectArgumentsException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

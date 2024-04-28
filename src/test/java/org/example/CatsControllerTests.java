@@ -47,8 +47,6 @@ import static org.testcontainers.shaded.org.hamcrest.MatcherAssert.assertThat;
 
 @SpringBootTest
 public class CatsControllerTests {
-    /*@LocalServerPort
-    private Integer port;*/
     @Autowired
     private WebApplicationContext webApplicationContext;
     @Autowired
