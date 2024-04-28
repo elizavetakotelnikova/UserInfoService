@@ -11,3 +11,5 @@ services:
     ports:
       - "7777:5432"
     restart: unless-stopped
+    volumes:
+      - ./log-directory:/var/lib/postgresql/data

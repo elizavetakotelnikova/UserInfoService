@@ -18,5 +18,6 @@ public interface OwnersDao extends JpaRepository<Owner, Long> {
     @NotNull List<Owner> findAll();
     Owner findById(long id);
     List<Owner> findByBirthday(LocalDate birthday);
+    Owner findOwnerByUsername(String username);
     void deleteById(long id);
 }

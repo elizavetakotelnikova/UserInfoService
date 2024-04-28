@@ -4,10 +4,9 @@ import org.example.entities.cat.Cat;
 import org.example.entities.owner.FindCriteria;
 import org.example.entities.owner.Owner;
 import org.example.exceptions.IncorrectArgumentsException;
+import org.example.owner.responseModels.JwtAuthToken;
 import org.example.owner.responseModels.OwnerCreateResponse;
 import org.example.owner.responseModels.OwnerIdResponse;
-import org.example.owner.responseModels.OwnersSavingDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +20,12 @@ import java.util.List;
 public class OwnersController {
     private final OwnerService service;
     private final ManagingCatsUsecases managingCatsUsecases;
+    @PostMapping("/owner/token")
+    public ResponseEntity<JwtAuthToken> getToken(@RequestBody UserLoginInfo userLoginInfo) {
+        var token = service.getToken(userLoginInfo.getUsername(), userLoginInfo.getPassword());
+        if (token == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new JwtAuthToken(token), HttpStatus.OK);
+    }
 
     @GetMapping("/owner/{ownerId}")
     public ResponseEntity<OwnerCreateResponse> getOwnerById(@PathVariable long ownerId) {
@@ -35,7 +40,7 @@ public class OwnersController {
         var criteria = new FindCriteria(birthday);
         var returnedOwner = service.getOwnerByCriteria(criteria);
         if (returnedOwner == null) return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        return new ResponseEntity<>(returnedOwner.stream().map(x -> new OwnerInfoDto(x.getId(), x.getBirthday(), x.getCats())).toList(), HttpStatus.OK);
+        return new ResponseEntity<>(returnedOwner.stream().map(x -> new OwnerInfoDto(x.getId(), x.getBirthday(), x.getCats(), x.getPassword().toString(), x.getUsername(), x.getAuthorities())).toList(), HttpStatus.OK);
     }
     @PostMapping("/owner")
     public ResponseEntity<OwnerIdResponse> save(@RequestBody OwnerInfoDto dto) {

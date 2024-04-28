@@ -41,7 +41,7 @@ public class CatServiceImpl implements CatService {
         if (criteria.getName() != null) return catsDao.findByName(criteria.getName());
         if (criteria.getBreed() != null) return catsDao.findByBreed(criteria.getBreed());
         if (criteria.getOwnerId() != null) return catsDao.findByOwnerId(criteria.getOwnerId());
-        return new ArrayList<>();
+        return catsDao.findAll();
     }
 
     @Override

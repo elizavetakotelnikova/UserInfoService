@@ -42,6 +42,10 @@ public class CatsController {
     public ResponseEntity<CatIdResponse> save(@RequestBody CatInfoDto dto) {
         Cat returnedCat;
         try {
+
+
+
+
             returnedCat = service.saveCat(dto);
         }
         catch (IncorrectArgumentsException e) {
