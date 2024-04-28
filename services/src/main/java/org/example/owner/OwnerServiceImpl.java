@@ -47,7 +47,7 @@ public class OwnerServiceImpl implements OwnerService {
             dto.setAuthorities(roles);
         }
         dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-        return ownersDao.save(new Owner(dto.getBirthday(), cats, dto.getUsername(), dto.getPassword().getBytes(), dto.getAuthorities()));
+        return ownersDao.save(new Owner(dto.getBirthday(), cats, dto.getUsername(), dto.getPassword(), dto.getAuthorities()));
     }
      @Override
     public List<Owner> getOwnerByCriteria(FindCriteria criteria) {
@@ -69,7 +69,7 @@ public class OwnerServiceImpl implements OwnerService {
             dto.setAuthorities(roles);
         }
         dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-        return ownersDao.save(new Owner(dto.getBirthday(), cats, dto.getUsername(), dto.getPassword().getBytes(), dto.getAuthorities()));
+        return ownersDao.save(new Owner(dto.getBirthday(), cats, dto.getUsername(), dto.getPassword(), dto.getAuthorities()));
     }
 
     @Override

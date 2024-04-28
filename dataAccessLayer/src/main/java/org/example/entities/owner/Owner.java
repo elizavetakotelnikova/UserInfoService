@@ -23,7 +23,7 @@ public class Owner {
     private java.time.LocalDate birthday;
     @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
     private List<Cat> cats;
-    private byte[] password;
+    private String password;
     private String username;
     @ManyToMany(targetEntity = Role.class, fetch = FetchType.EAGER)
     @JoinTable(
@@ -37,7 +37,7 @@ public class Owner {
         this.cats = cats;
     }
 
-    public Owner(LocalDate birthday, List<Cat> cats, String username, byte[] password, List<Role> role) {
+    public Owner(LocalDate birthday, List<Cat> cats, String username, String password, List<Role> role) {
         this.birthday = birthday;
         this.cats = cats;
         this.username = username;

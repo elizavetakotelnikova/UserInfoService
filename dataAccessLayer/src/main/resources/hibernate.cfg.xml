@@ -28,5 +28,6 @@
 
         <mapping class = "org.example.entities.cat.Cat"/>
         <mapping class ="org.example.entities.owner.Owner"/>
+        <mapping class = "org.example.entities.owner.Role"/>
     </session-factory>
 </hibernate-configuration>
