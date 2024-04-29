@@ -1,4 +1,4 @@
-package org.example.owner.responseModels;
+package org.example.owner.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
