@@ -11,7 +11,5 @@ public interface OwnerService {
     List<Owner> getOwnerByCriteria(FindCriteria criteria);
     Owner getOwnerById(long id);
     Owner update(OwnerInfoDto dto) throws IncorrectArgumentsException;
-    Owner getOwnerByUsername(String username);
-    String getToken(String username, String password);
     void delete(long id);
 }

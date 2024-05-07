@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:7777/techlabs
+    url: jdbc:postgresql://localhost:7778/techlabs
     username: postgres
     password: postgres
   main:
