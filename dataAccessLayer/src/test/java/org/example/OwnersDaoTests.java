@@ -1,4 +1,4 @@
-
+package org.example;
 import org.example.valueObjects.Color;
 import org.example.entities.cat.Cat;
 import org.example.entities.cat.CatsDao;
@@ -8,6 +8,8 @@ import org.example.entities.owner.OwnersDao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 class OwnersDaoTests {
     Owner testOwner;
     Cat testCat;
@@ -47,10 +50,10 @@ class OwnersDaoTests {
         var secondOwner = new Owner(LocalDate.parse("2003-12-23"), new ArrayList<>());
         ownersDao.save(secondOwner);
         assert(savedOwner.getId() != null);
-        var criteria = new FindCriteria(null, null);
+        /*var criteria = new FindCriteria(null, null);
         criteria.setBirthday(LocalDate.parse("2003-12-23"));
-        //List<Owner> foundOwners = ownersDao.findByCriteria(criteria);
-        List<Owner> foundOwners = ownersDao.findByBirthday(criteria.getBirthday());
+        List<Owner> foundOwners = ownersDao.findByCriteria(criteria);*/
+        List<Owner> foundOwners = ownersDao.findByBirthday(LocalDate.parse("2003-12-23"));
         var foundIds = foundOwners.stream().map(Owner::getId).toList();
         assert(!foundIds.contains(savedOwner.getId()));
         assert(foundIds.contains(secondOwner.getId()));

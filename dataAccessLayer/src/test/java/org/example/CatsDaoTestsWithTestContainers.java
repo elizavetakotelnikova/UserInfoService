@@ -1,7 +1,8 @@
+package org.example;
+
 import org.example.valueObjects.Color;
 import org.example.entities.cat.Cat;
 import org.example.entities.cat.CatsDao;
-import org.example.entities.cat.FindCriteria;
 import org.example.entities.owner.Owner;
 import org.example.entities.owner.OwnersDao;
 import org.flywaydb.core.Flyway;
@@ -9,7 +10,12 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.sql.Connection;
@@ -21,14 +27,14 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-
+@SpringBootTest(classes = TestDataAccessLayerApplication.class)
 class CatsDaoTestsWithTestContainers {
-    Cat testCat;
-    Owner testOwner;
+    private Cat testCat;
+    private Owner testOwner;
     @Autowired
-    CatsDao catsDao;
+    private CatsDao catsDao;
     @Autowired
-    OwnersDao ownersDao;
+    private OwnersDao ownersDao;
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
             "postgres:15-alpine"
     );
@@ -62,6 +68,12 @@ class CatsDaoTestsWithTestContainers {
                                 container.getPassword())
         );
     }
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
     @BeforeEach
     void setUpEntities() {
         testOwner = new Owner(LocalDate.parse("2004-12-12"), new ArrayList<>());
@@ -92,7 +104,7 @@ class CatsDaoTestsWithTestContainers {
         secondTestCat.getFriends().add(testCat);
         var secondSavedCat = catsDao.save(secondTestCat);
         testCat.getFriends().add(secondTestCat);
-        catsDao.update(savedCat);
+        catsDao.save(savedCat);
         assert(savedCat.getId() != null);
         Cat foundCat = catsDao.findById(savedCat.getId()).get();
         Cat foundSecondCat = catsDao.findById(secondSavedCat.getId()).get();
@@ -112,9 +124,9 @@ class CatsDaoTestsWithTestContainers {
                 testOwner, LocalDate.parse("2017-08-04"), new ArrayList<>());
         var thirdSavedCat = catsDao.save(thirdTestCat);
         assert(savedCat.getId() != null);
-        var criteria = new FindCriteria();
-        criteria.setName("Tina");
-        List<Cat> foundCats = catsDao.findByCriteria(criteria);
+        /*var criteria = new FindCriteria();
+        criteria.setName("Tina");*/
+        List<Cat> foundCats = catsDao.findByName("Tina");
         var foundIds = foundCats.stream().map(Cat::getId).toList();
 
         assert(!foundIds.contains(thirdSavedCat.getId()));

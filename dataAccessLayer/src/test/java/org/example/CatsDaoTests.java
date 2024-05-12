@@ -1,3 +1,5 @@
+package org.example;
+
 import org.example.entities.cat.Cat;
 import org.example.entities.cat.CatsDao;
 import org.example.entities.owner.Owner;
@@ -6,12 +8,14 @@ import org.example.valueObjects.Color;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 class CatsDaoTests {
     Cat testCat;
     Owner testOwner;
@@ -48,7 +52,7 @@ class CatsDaoTests {
         secondTestCat.getFriends().add(testCat);
         var secondSavedCat = catsDao.save(secondTestCat);
         testCat.getFriends().add(secondTestCat);
-        catsDao.update(savedCat);
+        catsDao.save(savedCat);
         assert(savedCat.getId() != null);
         Cat foundCat = catsDao.findById(savedCat.getId()).get();
         Cat foundSecondCat = catsDao.findById(secondSavedCat.getId()).get();
