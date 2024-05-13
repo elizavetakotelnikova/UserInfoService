@@ -6,6 +6,7 @@ import org.example.entities.owner.Owner;
 import org.example.entities.owner.OwnersDao;
 import org.example.entities.owner.FindCriteria;
 import org.example.entities.user.RolesDao;
+import org.example.entities.user.UsersDao;
 import org.example.exceptions.IncorrectArgumentsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,12 +19,14 @@ import java.util.List;
 public class OwnerServiceImpl implements OwnerService {
     private final CatsDao catsDao;
     private final OwnersDao ownersDao;
+    private final UsersDao usersDao;
     private final RolesDao rolesDao;
     private final PasswordEncoder passwordEncoder;
     @Autowired
-    public OwnerServiceImpl(CatsDao catsDao, OwnersDao ownersDao, RolesDao rolesDao, PasswordEncoder passwordEncoder) {
+    public OwnerServiceImpl(CatsDao catsDao, OwnersDao ownersDao, UsersDao usersDao, RolesDao rolesDao, PasswordEncoder passwordEncoder) {
         this.catsDao = catsDao;
         this.ownersDao = ownersDao;
+        this.usersDao = usersDao;
         this.rolesDao = rolesDao;
         this.passwordEncoder = passwordEncoder;
     }
@@ -48,11 +51,14 @@ public class OwnerServiceImpl implements OwnerService {
     public Owner update(OwnerInfoDto dto) throws IncorrectArgumentsException {
         if (dto.getBirthday() == null || dto.getId() == null) throw new IncorrectArgumentsException("Incorrect data provided, unable to update an owner");
         var cats = dto.getCats().stream().map(x -> catsDao.findById(x.getId()).get()).toList();
-        return ownersDao.save(new Owner(dto.getBirthday(), cats));
+        return ownersDao.save(new Owner(dto.getId(), dto.getBirthday(), cats));
     }
 
     @Override
     public void delete(long id) {
+        var returnedOwner =  ownersDao.findById(id);
+        var returnedUser = usersDao.findByOwner(returnedOwner);
+        returnedUser.setOwner(null);
         ownersDao.deleteById(id);
     }
 }

@@ -9,9 +9,9 @@ import java.util.List;
 public interface UserService {
     User saveUser(UserInfoDto dto) throws IncorrectArgumentsException;
     User getUserById(long id);
-    User update(UserInfoDto dto) throws IncorrectArgumentsException;
+    User updateWithPasswordChange(UserInfoDto dto) throws IncorrectArgumentsException;
     List<User> getUserByCriteria(FindCriteria criteria);
     User getUserByUsername(String username);
-    String getToken(String username, String password);
+    User updateRegularInfo(UserInfoDto dto) throws IncorrectArgumentsException;
     void delete(long id);
 }

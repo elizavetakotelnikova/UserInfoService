@@ -55,9 +55,10 @@ public class WebSecurityConfigurer {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(customizer ->
-                        customizer.requestMatchers(HttpMethod.POST,"/owner").permitAll()
-                                .requestMatchers("/owner/login").permitAll()
+                        customizer.requestMatchers(HttpMethod.POST,"/user").permitAll()
+                                .requestMatchers("/user/login").permitAll()
                         .anyRequest().authenticated())
+                //owner - permitAll()?
                 .httpBasic(httpSecurityConfigurer-> httpSecurityConfigurer.authenticationEntryPoint((request, response, authException) -> response.sendError(401)))
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)

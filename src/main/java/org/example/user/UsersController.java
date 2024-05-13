@@ -1,6 +1,5 @@
 package org.example.user;
 import lombok.RequiredArgsConstructor;
-import org.example.entities.cat.Cat;
 import org.example.entities.user.FindCriteria;
 import org.example.entities.user.Role;
 import org.example.entities.user.User;
@@ -16,7 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -36,13 +35,15 @@ public class UsersController {
         return new ResponseEntity<>("Successfully logged in", HttpStatus.OK);
     }
 
-    @PreAuthorize("#userId == authentication.principal.id" + "|| hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("#userId == authentication.principal.id" + "|| hasRole('ROLE_ADMIN')")
     @GetMapping("/user/{userId}")
     public ResponseEntity<UserInfoResponse> getUserById(@PathVariable long userId) {
         //if (!securityChecker.isAdmin() && !UserIdentitySecurityChecker.checkUserIdentity(userId)) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         var returnedUser = service.getUserById(userId);
         if (returnedUser == null) return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        return new ResponseEntity<>(new UserInfoResponse(returnedUser.getId(), returnedUser.getOwner().getId(), returnedUser.getUsername(), returnedUser.getAuthorities()),
+        Long returnOwnerId = null;
+        if (returnedUser.getOwner() != null) returnOwnerId = returnedUser.getOwner().getId();
+        return new ResponseEntity<>(new UserInfoResponse(returnedUser.getId(), returnOwnerId, returnedUser.getUsername(), returnedUser.getAuthorities()),
                 HttpStatus.OK);
     }
     @GetMapping("/users")
@@ -50,7 +51,13 @@ public class UsersController {
         var criteria = new FindCriteria(new Role(role));
         var returnedUser = service.getUserByCriteria(criteria);
         if (returnedUser == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        return new ResponseEntity<>(returnedUser.stream().map(x -> new UserInfoResponse(x.getId(), x.getOwner().getId(), x.getUsername(), x.getAuthorities())).toList(), HttpStatus.OK);
+        List<UserInfoResponse> responses = new ArrayList<>();
+        for (var each : returnedUser) {
+            Long returnOwnerId = null;
+            if (each.getOwner() != null) returnOwnerId = each.getOwner().getId();
+            responses.add(new UserInfoResponse(each.getId(), returnOwnerId, each.getUsername(), each.getAuthorities()));
+        }
+        return new ResponseEntity<>(responses, HttpStatus.OK);
     }
     @PostMapping("/user")
     public ResponseEntity<UserIdResponse> save(@RequestBody UserInfoDto dto) {
@@ -70,7 +77,7 @@ public class UsersController {
         //if (!securityChecker.isAdmin() && !UserIdentitySecurityChecker.checkUserIdentity(userId)) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         User returnedUser;
         try {
-            returnedUser = service.update(dto);
+            returnedUser = service.updateWithPasswordChange(dto);
         }
         catch (IncorrectArgumentsException e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);

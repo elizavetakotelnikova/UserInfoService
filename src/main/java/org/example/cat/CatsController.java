@@ -6,6 +6,7 @@ import org.example.entities.cat.Cat;
 import org.example.entities.cat.FindCriteria;
 import org.example.exceptions.IncorrectArgumentsException;
 import org.example.infrastructure.UserIdentitySecurityChecker;
+import org.example.user.UserService;
 import org.example.valueObjects.Color;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
@@ -22,10 +23,11 @@ import java.util.List;
 public class CatsController {
     private final CatService service;
     private final FriendUsecases friendUsecases;
+    private final UserService userService;
     private final UserIdentitySecurityChecker securityChecker;
     @GetMapping("/cat/{catId}")
     public ResponseEntity<CatCreateResponse> getCatById(@PathVariable long catId) {
-        if (!securityChecker.isAdmin() && !securityChecker.checkUserIdentityForCats(catId)) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        if (!securityChecker.isAdmin() && !securityChecker.checkContextOwnerForCat(catId)) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         var returnedCat = service.getCatById(catId);
         if (returnedCat == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(new CatCreateResponse(returnedCat.getId(), returnedCat.getName(),
@@ -42,7 +44,7 @@ public class CatsController {
         if (!securityChecker.isAdmin()) {
             for (Cat each : returnedCats) {
                 try {
-                    securityChecker.checkUserIdentityForCats(each);
+                    securityChecker.checkContextOwnerForCat(each);
                 } catch (AccessDeniedException exception) {
                     continue;
                 }
@@ -57,7 +59,13 @@ public class CatsController {
     }
     @PostMapping("/cat")
     public ResponseEntity<CatIdResponse> save(@RequestBody CatInfoDto dto) {
-        if (!securityChecker.isAdmin() && !UserIdentitySecurityChecker.checkUserIdentity(dto.getOwnerId())) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        if (dto.getOwnerId() == null) {
+            var currentUser = securityChecker.getUserId();
+            var user = userService.getUserById(currentUser);
+            if (user.getOwner() == null) return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            dto.setOwnerId(user.getOwner().getId());
+        }
+        if (!securityChecker.isAdmin() && !securityChecker.checkIsTheContextOwner(dto.getOwnerId())) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         Cat returnedCat;
         try {
             returnedCat = service.saveCat(dto);
@@ -69,7 +77,7 @@ public class CatsController {
     }
     @PutMapping("/cat/{catId}")
     public ResponseEntity<CatIdResponse> update(@RequestBody CatInfoDto dto, @PathVariable long catId) {
-        if (!securityChecker.isAdmin() && !securityChecker.checkUserIdentityForCats(catId)) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        if (!securityChecker.isAdmin() && !securityChecker.checkContextOwnerForCat(catId)) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         Cat updatedCat;
         try {
             updatedCat = service.update(dto);
@@ -81,7 +89,7 @@ public class CatsController {
     }
     @DeleteMapping("/cat/{catId}")
     public void delete(@PathVariable long catId) {
-        if (!securityChecker.isAdmin() && !securityChecker.checkUserIdentityForCats(catId)) throw new AccessDeniedException("Access denied");
+        if (!securityChecker.isAdmin() && !securityChecker.checkContextOwnerForCat(catId)) throw new AccessDeniedException("Access denied");
         service.delete(catId);
     }
 }

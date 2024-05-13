@@ -1,5 +1,6 @@
 package org.example.user;
 import org.example.entities.cat.CatsDao;
+import org.example.entities.owner.Owner;
 import org.example.entities.owner.OwnersDao;
 import org.example.entities.user.FindCriteria;
 import org.example.entities.user.RolesDao;
@@ -30,11 +31,10 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = passwordEncoder;
     }
     private boolean validateUser(UserInfoDto dto) {
-        try {
-            var owner = ownersDao.findById(dto.getOwnerId());
-        }
-        catch (Exception e) {
-            return false;
+        if (dto.getOwnerId() != null) {
+            if (ownersDao.findById(dto.getOwnerId()).isEmpty()) {
+                return false;
+            }
         }
         if (dto.getUsername() == null) return false;
         if (dto.getPassword() == null) return false;
@@ -50,7 +50,10 @@ public class UserServiceImpl implements UserService {
             dto.setAuthorities(roles);
         }
         dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-        var owner = ownersDao.findById(dto.getOwnerId()).orElse(null);
+        Owner owner = null;
+        if (dto.getOwnerId() != null) {
+            owner = ownersDao.findById(dto.getOwnerId()).orElse(null);
+        }
         return usersDao.save(new User(owner, dto.getUsername(), dto.getPassword(), dto.getAuthorities()));
     }
 
@@ -59,7 +62,7 @@ public class UserServiceImpl implements UserService {
         return usersDao.findById(id);
     }
     @Override
-    public User update(UserInfoDto dto) throws IncorrectArgumentsException {
+    public User updateWithPasswordChange(UserInfoDto dto) throws IncorrectArgumentsException {
         if (!validateUser(dto) || dto.getId() == null) throw new IncorrectArgumentsException("Incorrect data provided, unable to update an user");
         if (dto.getAuthorities() == null) {
             var roles = new ArrayList<org.example.entities.user.Role>();
@@ -68,7 +71,7 @@ public class UserServiceImpl implements UserService {
         }
         dto.setPassword(passwordEncoder.encode(dto.getPassword()));
         var owner = ownersDao.findById(dto.getOwnerId()).orElse(null);;
-        return usersDao.save(new User(owner, dto.getUsername(), dto.getPassword(), dto.getAuthorities()));
+        return usersDao.save(new User(dto.getId(), owner, dto.getPassword(), dto.getUsername(), dto.getAuthorities()));
     }
 
     @Override
@@ -83,8 +86,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String getToken(String username, String password) {
-        return null;
+    public User updateRegularInfo(UserInfoDto dto) throws IncorrectArgumentsException {
+        if (!validateUser(dto) || dto.getId() == null) throw new IncorrectArgumentsException("Incorrect data provided, unable to update an user");
+        if (dto.getAuthorities() == null) {
+            var roles = new ArrayList<org.example.entities.user.Role>();
+            roles.add(new org.example.entities.user.Role(Role.ROLE_USER.toString()));
+            dto.setAuthorities(roles);
+        }
+        var owner = ownersDao.findById(dto.getOwnerId()).orElse(null);;
+        return usersDao.save(new User(dto.getId(), owner, dto.getPassword(), dto.getUsername(), dto.getAuthorities()));
     }
 
     @Override

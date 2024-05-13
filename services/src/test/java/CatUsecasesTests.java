@@ -39,7 +39,7 @@ class CatUsecasesTests {
     void saveCatUsecase() {
         var catService = new CatServiceImpl(catsDao, ownersDao);
         /*try {
-            var cat = catService.saveCat(new catSavingDto(testCat.getName(), testCat.getBreed(),
+            var cat = catService.saveCat(new CatInfoDto(null, testCat.getName(), testCat.getBreed(),
                     testCat.getColor(), testCat.getId(), testCat.getBirthday(), new ArrayList<>()));
             verify(catsDao, times(1)).save(cat);
         }

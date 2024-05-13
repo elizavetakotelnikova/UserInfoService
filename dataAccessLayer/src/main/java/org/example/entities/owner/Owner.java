@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.example.entities.cat.Cat;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,7 +23,7 @@ public class Owner {
     private Long id;
     private java.time.LocalDate birthday;
     @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
-    private List<Cat> cats;
+    private List<Cat> cats = new ArrayList<>();
     public Owner(LocalDate date, List<Cat> cats) {
         this.birthday = date;
         this.cats = cats;

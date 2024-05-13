@@ -20,7 +20,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @OneToOne(targetEntity = Owner.class)
-    @JoinColumn(name="owner_id", nullable = false)
+    @JoinColumn(name="owner_id")
     private Owner owner;
     private String password;
     private String username;

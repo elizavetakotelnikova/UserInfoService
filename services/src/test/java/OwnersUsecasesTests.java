@@ -1,3 +1,5 @@
+import org.example.entities.user.RolesDao;
+import org.example.entities.user.UsersDao;
 import org.example.valueObjects.Color;
 import org.example.entities.cat.Cat;
 import org.example.entities.cat.CatsDao;
@@ -11,6 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -23,7 +27,13 @@ class OwnersUsecasesTests {
     @Mock
     OwnersDao ownersDao;
     @Mock
+    UsersDao usersDao;
+    @Mock
     CatsDao catsDao;
+    @Mock
+    RolesDao rolesDao;
+    @Autowired
+    PasswordEncoder passwordEncoder;
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -37,13 +47,13 @@ class OwnersUsecasesTests {
     }
     @Test
     void saveOwnerUsecaseTest() {
-        var ownerService = new OwnerServiceImpl(catsDao, ownersDao);
+        var ownerService = new OwnerServiceImpl(catsDao, ownersDao, usersDao, rolesDao, passwordEncoder);
         Exception exception = assertThrows(IncorrectArgumentsException.class, () -> ownerService.saveOwner(new OwnerInfoDto(null, null, new ArrayList<>())));
         assertEquals(IncorrectArgumentsException.class, exception.getClass());
     }
     @Test
     void deleteOwnerUsecaseTest() {
-        var ownerService = new OwnerServiceImpl(catsDao, ownersDao);
+        var ownerService = new OwnerServiceImpl(catsDao, ownersDao, usersDao, rolesDao, passwordEncoder);
         try {
             when(ownersDao.findById(1)).thenReturn(testOwner);
             ownerService.delete(1);
@@ -59,7 +69,7 @@ class OwnersUsecasesTests {
 
     @Test
     void addCatUsecaseTest() {
-        var ownerService = new OwnerServiceImpl(catsDao, ownersDao);
+        var ownerService = new OwnerServiceImpl(catsDao, ownersDao, usersDao, rolesDao, passwordEncoder);
         var catManagingService = new ManagingCatsUsecasesImpl(ownersDao, catsDao);
         when(ownersDao.findById(1)).thenReturn(testOwner);
         catManagingService.addToCatList(testOwner.getId(), testCat.getId());

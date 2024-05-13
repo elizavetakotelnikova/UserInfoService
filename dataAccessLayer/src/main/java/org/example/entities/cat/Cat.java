@@ -11,6 +11,7 @@ import org.example.entities.owner.Owner;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -39,7 +40,7 @@ public class Cat {
             joinColumns = { @JoinColumn(name = "second_cat_id") },
             inverseJoinColumns = { @JoinColumn(name = "first_cat_id") }
     )
-    private List<Cat> friends;
+    private List<Cat> friends = new ArrayList<>();
 
     public Cat(String name, String breed, Color color, Owner owner, LocalDate date, List<Cat> friends) {
         this.name = name;
