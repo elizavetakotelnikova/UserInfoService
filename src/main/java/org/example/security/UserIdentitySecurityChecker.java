@@ -45,9 +45,10 @@ public class UserIdentitySecurityChecker {
             throw new AccessDeniedException("Access denied");
         }
         CustomUser details = (CustomUser) auth.getPrincipal();
+        var user = usersDao.findById(details.getId()).get();
         var owner = ownersDao.findById(ownerId).orElse(null);
         if (owner == null) throw new AccessDeniedException("Access denied");
-        if (!Objects.equals(ownerId, owner.getUser().getId())) {
+        if (!Objects.equals(user.getId(), owner.getUser().getId())) {
             throw new AccessDeniedException("Access denied");
         }
         return true;

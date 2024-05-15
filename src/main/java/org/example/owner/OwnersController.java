@@ -27,9 +27,9 @@ public class OwnersController {
     private final UserService usersService;
     @GetMapping("/owner/{ownerId}")
     public ResponseEntity<OwnerInfoResponse> getOwnerById(@PathVariable long ownerId) {
-        /*if (!securityChecker.isAdmin() && !securityChecker.checkIsTheContextOwner(ownerId)) {
+        if (!securityChecker.isAdmin() && !securityChecker.checkIsTheContextOwner(ownerId)) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
-        }*/
+        } //надо ли?
         var returnedOwner = service.getOwnerById(ownerId);
         if (returnedOwner == null) return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         return new ResponseEntity<>(new OwnerInfoResponse(returnedOwner.getId(), returnedOwner.getBirthday(), returnedOwner.getCats().stream().map(Cat::getId).toList(),
@@ -63,8 +63,9 @@ public class OwnersController {
         if (!securityChecker.isAdmin() && !securityChecker.checkIsTheContextOwner(ownerId)) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
-        Owner returnedOwner;
+        if (dto.getUserId() == null) dto.setUserId(securityChecker.getUserId());
         if (dto.getId() == null) dto.setId(ownerId);
+        Owner returnedOwner;
         try {
             returnedOwner = service.update(dto);
         }

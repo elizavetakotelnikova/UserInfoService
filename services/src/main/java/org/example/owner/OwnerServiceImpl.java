@@ -33,6 +33,7 @@ public class OwnerServiceImpl implements OwnerService {
     @Override
     public Owner saveOwner(OwnerInfoDto dto) throws IncorrectArgumentsException {
         if (dto.getBirthday() == null || dto.getUserId() == null) throw new IncorrectArgumentsException("Incorrect data provided, unable to create an owner");
+        if (ownersDao.findByUser(usersDao.findById(dto.getUserId()).get()) != null) throw new IncorrectArgumentsException("Incorrect data provided, owner with same userId already exists");
         List<Cat> cats = new ArrayList<>();
         if (dto.getCats() != null) cats = dto.getCats().stream().map(x -> catsDao.findById(x.getId()).get()).toList();
         var user = usersDao.findById(dto.getUserId()).get();

@@ -19,7 +19,7 @@ public class ContextManager {
             var currentUser = securityChecker.getUserId();
             var user = userService.getUserById(currentUser);
             var owner = ownerService.getOwnerByCriteria(new FindCriteria(null, user.getId()));
-            if (owner.isEmpty()) return false;
+            if (owner.isEmpty() || owner.getFirst() == null) return false;
             dto.setOwnerId(owner.getFirst().getId());
         }
         return true;

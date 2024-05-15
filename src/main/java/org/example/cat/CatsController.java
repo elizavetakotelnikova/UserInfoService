@@ -59,8 +59,8 @@ public class CatsController {
     }
     @PostMapping("/cat")
     public ResponseEntity<CatIdResponse> save(@RequestBody CatInfoDto dto) {
-        if (!securityChecker.isAdmin() && !securityChecker.checkIsTheContextOwner(dto.getOwnerId())) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         if (!contextManager.setCurrentOwner(dto)) return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        if (!securityChecker.isAdmin() && !securityChecker.checkIsTheContextOwner(dto.getOwnerId())) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         Cat returnedCat;
         try {
             returnedCat = service.saveCat(dto);
@@ -73,6 +73,8 @@ public class CatsController {
     @PutMapping("/cat/{catId}")
     public ResponseEntity<CatIdResponse> update(@RequestBody CatInfoDto dto, @PathVariable long catId) {
         if (!securityChecker.isAdmin() && !securityChecker.checkContextOwnerForCat(catId)) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        if (dto.getId() == null) dto.setId(catId);
+        if (!contextManager.setCurrentOwner(dto)) return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         Cat updatedCat;
         try {
             updatedCat = service.update(dto);

@@ -137,9 +137,7 @@ response:
 
 ```json
 {
-  "birthday": "2004-02-03",
-  "username": "username",
-  "password": "password"
+  "birthday": "2004-02-03"
 }
 ```
 
