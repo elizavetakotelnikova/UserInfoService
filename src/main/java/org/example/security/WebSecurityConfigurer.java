@@ -12,6 +12,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -61,6 +62,9 @@ public class WebSecurityConfigurer {
                 .httpBasic(httpSecurityConfigurer-> httpSecurityConfigurer.authenticationEntryPoint((request, response, authException) -> response.sendError(401)))
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
+                .formLogin(form -> form
+                .loginPage("/login")
+                .permitAll())
         .build();
     }
     @Bean
