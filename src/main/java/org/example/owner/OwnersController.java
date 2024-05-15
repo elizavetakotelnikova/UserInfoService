@@ -4,7 +4,7 @@ import org.example.entities.cat.Cat;
 import org.example.entities.owner.FindCriteria;
 import org.example.entities.owner.Owner;
 import org.example.exceptions.IncorrectArgumentsException;
-import org.example.infrastructure.UserIdentitySecurityChecker;
+import org.example.security.UserIdentitySecurityChecker;
 import org.example.owner.dto.OwnerIdResponse;
 import org.example.owner.dto.OwnerInfoResponse;
 import org.example.user.UserInfoDto;
@@ -13,7 +13,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;

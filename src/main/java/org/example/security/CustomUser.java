@@ -1,4 +1,4 @@
-package org.example.infrastructure;
+package org.example.security;
 
 import lombok.Getter;
 import org.springframework.security.core.userdetails.User;

@@ -58,6 +58,8 @@ public class OwnerServiceImpl implements OwnerService {
     public void delete(long id) {
         var returnedOwner =  ownersDao.findById(id);
         var returnedUser = usersDao.findByOwner(returnedOwner);
+        /*var returnedCat = catsDao.findByOwnerId(id);
+        returnedCat.*/
         returnedUser.setOwner(null);
         ownersDao.deleteById(id);
     }

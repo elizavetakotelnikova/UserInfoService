@@ -12,12 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private final CatsDao catsDao;
     private final OwnersDao ownersDao;
     private final UsersDao usersDao;
     private final RolesDao rolesDao;
@@ -25,7 +25,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public UserServiceImpl(OwnersDao ownersDao, CatsDao catsDao, UsersDao usersDao, RolesDao rolesDao, PasswordEncoder passwordEncoder) {
         this.ownersDao = ownersDao;
-        this.catsDao = catsDao;
         this.usersDao = usersDao;
         this.rolesDao = rolesDao;
         this.passwordEncoder = passwordEncoder;
@@ -54,6 +53,11 @@ public class UserServiceImpl implements UserService {
         if (dto.getOwnerId() != null) {
             owner = ownersDao.findById(dto.getOwnerId()).orElse(null);
         }
+        else {
+            var returnedOwner = ownersDao.save(new Owner(LocalDate.now(), new ArrayList<>()));
+            dto.setOwnerId(returnedOwner.getId());
+        }
+        // два варианта, с созданием владельца и без
         return usersDao.save(new User(owner, dto.getUsername(), dto.getPassword(), dto.getAuthorities()));
     }
 

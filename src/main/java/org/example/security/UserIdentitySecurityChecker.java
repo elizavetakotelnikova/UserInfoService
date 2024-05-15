@@ -1,8 +1,9 @@
-package org.example.infrastructure;
+package org.example.security;
 
 import lombok.RequiredArgsConstructor;
 import org.example.entities.cat.Cat;
 import org.example.entities.cat.CatsDao;
+import org.example.entities.owner.Owner;
 import org.example.entities.user.User;
 import org.example.entities.user.UsersDao;
 import org.springframework.security.access.AccessDeniedException;
@@ -42,8 +43,10 @@ public class UserIdentitySecurityChecker {
             throw new AccessDeniedException("Access denied");
         }
         CustomUser details = (CustomUser) auth.getPrincipal();
-        Long foundOwnerId = usersDao.findById(details.getId()).get().getOwner().getId();
-        if (!Objects.equals(ownerId, foundOwnerId) || ownerId == null) {
+        User user = usersDao.findById(details.getId()).orElse(null);
+        if (user == null) throw new AccessDeniedException("Access denied");
+        Owner owner = user.getOwner();
+        if (owner == null || !Objects.equals(ownerId, owner.getId())) {
             throw new AccessDeniedException("Access denied");
         }
         return true;
@@ -54,9 +57,10 @@ public class UserIdentitySecurityChecker {
             throw new AccessDeniedException("Access denied");
         }
         CustomUser details = (CustomUser) auth.getPrincipal();
-        Long ownerId = catsDao.findById(catId).get().getOwner().getId();
-        User user = usersDao.findById(details.getId()).get();
-        if (!Objects.equals(ownerId, user.getOwner().getId())) {
+        Cat cat = catsDao.findById(catId).orElse(null);
+        if (cat == null) throw new AccessDeniedException("Access denied");
+        User user = usersDao.findById(details.getId()).orElse(null);
+        if (user == null || !Objects.equals(cat.getOwner().getId(), user.getOwner().getId())) {
             throw new AccessDeniedException("Access denied");
         }
         return true;

@@ -4,7 +4,8 @@ import org.example.entities.user.FindCriteria;
 import org.example.entities.user.Role;
 import org.example.entities.user.User;
 import org.example.exceptions.IncorrectArgumentsException;
-import org.example.infrastructure.UserIdentitySecurityChecker;
+import org.example.security.UserIdentitySecurityChecker;
+import org.example.owner.OwnerService;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ public class UsersController {
     private final UserService service;
     private final AuthenticationManager authenticationManager;
     private final UserIdentitySecurityChecker securityChecker;
+    private final OwnerService ownersService;
 
     @PostMapping("/user/login")
     public ResponseEntity<String> loginUser(@RequestBody UserLoginDto loginDto){

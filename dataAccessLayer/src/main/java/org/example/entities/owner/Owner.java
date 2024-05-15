@@ -22,7 +22,7 @@ public class Owner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private java.time.LocalDate birthday;
-    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER, cascade=CascadeType.REMOVE)
     private List<Cat> cats = new ArrayList<>();
     public Owner(LocalDate date, List<Cat> cats) {
         this.birthday = date;

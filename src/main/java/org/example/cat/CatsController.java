@@ -5,7 +5,8 @@ import org.example.cat.dto.CatIdResponse;
 import org.example.entities.cat.Cat;
 import org.example.entities.cat.FindCriteria;
 import org.example.exceptions.IncorrectArgumentsException;
-import org.example.infrastructure.UserIdentitySecurityChecker;
+import org.example.security.ContextManager;
+import org.example.security.UserIdentitySecurityChecker;
 import org.example.user.UserService;
 import org.example.valueObjects.Color;
 import org.springframework.data.repository.query.Param;
@@ -15,7 +16,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -25,6 +25,7 @@ public class CatsController {
     private final FriendUsecases friendUsecases;
     private final UserService userService;
     private final UserIdentitySecurityChecker securityChecker;
+    private final ContextManager contextManager;
     @GetMapping("/cat/{catId}")
     public ResponseEntity<CatCreateResponse> getCatById(@PathVariable long catId) {
         if (!securityChecker.isAdmin() && !securityChecker.checkContextOwnerForCat(catId)) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
@@ -40,31 +41,25 @@ public class CatsController {
         var criteria = new FindCriteria(name, breed, color, ownerId, birthday);
         var returnedCats = service.getCatByCriteria(criteria);
         if (returnedCats == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        List<Cat> allowedCats = new ArrayList<>();
-        if (!securityChecker.isAdmin()) {
-            for (Cat each : returnedCats) {
-                try {
-                    securityChecker.checkContextOwnerForCat(each);
-                } catch (AccessDeniedException exception) {
-                    continue;
-                }
-                allowedCats.add(each);
-            }
-        }
+        List<Cat> allowedCats;
+        if (securityChecker.isAdmin()) allowedCats = returnedCats;
         else {
-            allowedCats = returnedCats;
+            allowedCats = returnedCats.stream().filter(x -> {
+                    try {
+                        securityChecker.checkContextOwnerForCat(x);
+                    }
+                    catch (AccessDeniedException exc) {
+                        return false;
+                    }
+                    return true;
+            }).toList();
         }
         return new ResponseEntity<>(allowedCats.stream().map(x -> new CatInfoDto(x.getId(), x.getName(), x.getBreed(),
                 x.getColor(), x.getOwner().getId(), x.getBirthday(), x.getFriends().stream().map(y -> x.getId()).toList())).toList(), HttpStatus.OK);
     }
     @PostMapping("/cat")
     public ResponseEntity<CatIdResponse> save(@RequestBody CatInfoDto dto) {
-        if (dto.getOwnerId() == null) {
-            var currentUser = securityChecker.getUserId();
-            var user = userService.getUserById(currentUser);
-            if (user.getOwner() == null) return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-            dto.setOwnerId(user.getOwner().getId());
-        }
+        if (!contextManager.setCurrentOwner(dto)) return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         if (!securityChecker.isAdmin() && !securityChecker.checkIsTheContextOwner(dto.getOwnerId())) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         Cat returnedCat;
         try {

@@ -1,8 +1,7 @@
-package org.example.infrastructure;
+package org.example.security;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.example.entities.owner.OwnersDao;
 import org.example.entities.user.Role;
 import org.example.entities.user.RolesDao;
 import org.example.entities.user.UsersDao;

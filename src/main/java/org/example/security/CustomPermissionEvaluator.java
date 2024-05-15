@@ -1,4 +1,4 @@
-package org.example.infrastructure;
+package org.example.security;
 
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
