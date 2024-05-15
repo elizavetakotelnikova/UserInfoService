@@ -62,9 +62,9 @@ public class WebSecurityConfigurer {
                 .httpBasic(httpSecurityConfigurer-> httpSecurityConfigurer.authenticationEntryPoint((request, response, authException) -> response.sendError(401)))
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
-                .formLogin(form -> form
+                /*.formLogin(form -> form
                 .loginPage("/login")
-                .permitAll())
+                .permitAll())*/
         .build();
     }
     @Bean
