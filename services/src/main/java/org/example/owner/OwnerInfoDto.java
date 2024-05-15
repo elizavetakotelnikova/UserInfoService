@@ -11,5 +11,6 @@ public class OwnerInfoDto {
     private Long id;
     private java.time.LocalDate birthday;
     private List<Cat> cats;
+    private Long userId;
 }
 

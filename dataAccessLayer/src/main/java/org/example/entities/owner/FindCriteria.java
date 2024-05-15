@@ -10,4 +10,5 @@ import org.jetbrains.annotations.Nullable;
 public class FindCriteria {
     @Nullable
     private java.time.LocalDate birthday;
+    private Long userId;
 }

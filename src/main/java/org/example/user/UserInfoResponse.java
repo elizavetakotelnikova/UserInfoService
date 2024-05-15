@@ -10,7 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 public class UserInfoResponse {
     private Long id;
-    private Long ownerId;
     private String username;
     private List<Role> authorities;
 }

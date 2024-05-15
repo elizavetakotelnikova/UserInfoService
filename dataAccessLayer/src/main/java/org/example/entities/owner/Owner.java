@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.entities.cat.Cat;
+import org.example.entities.user.User;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,8 +25,12 @@ public class Owner {
     private java.time.LocalDate birthday;
     @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER, cascade=CascadeType.REMOVE)
     private List<Cat> cats = new ArrayList<>();
-    public Owner(LocalDate date, List<Cat> cats) {
+    @OneToOne(targetEntity = User.class)
+    @JoinColumn(name="user_id")
+    private User user;
+    public Owner(LocalDate date, List<Cat> cats, User user) {
         this.birthday = date;
         this.cats = cats;
+        this.user = user;
     }
 }

@@ -53,13 +53,13 @@ public class OwnersControllerTests {
     }
     @BeforeEach
     void setUp() {
-        testOwner = new Owner(LocalDate.parse("2004-12-12"), new ArrayList<>());
         testCat = new Cat("Tina", "British shorthair", Color.GREY,
                 testOwner, LocalDate.parse("2017-08-04"), new ArrayList<>());
-        testOwner.getCats().add(testCat);
-        ownersDao.save(testOwner);
-        testUser = new User(testOwner, "username", "password", new ArrayList<>());
+        testUser = new User("username", "password", new ArrayList<>());
         usersDao.save(testUser);
+        testOwner = new Owner(LocalDate.parse("2004-12-12"), new ArrayList<>(), testUser);
+        ownersDao.save(testOwner);
+        testOwner.getCats().add(testCat);
         userDetails = new CustomUser(testUser.getId(), testUser.getUsername(), testUser.getPassword(),
                 new ArrayList<>());
     }
@@ -113,7 +113,6 @@ public class OwnersControllerTests {
     }
     @Test
     public void deleteOwnerTest_ShouldReturn200Status() throws Exception {
-        ownersDao.save(testOwner);
         MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders.delete("/owner/{ownerId}", testOwner.getId()).with(user(userDetails))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();

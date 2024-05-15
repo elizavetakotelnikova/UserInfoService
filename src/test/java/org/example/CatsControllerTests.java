@@ -56,13 +56,13 @@ public class CatsControllerTests {
     }
     @BeforeEach
     void setUp() {
-        testOwner = new Owner(LocalDate.parse("2004-12-12"), new ArrayList<>());
+        testUser = new User("username", "password", new ArrayList<>());
+        usersDao.save(testUser);
+        testOwner = new Owner(LocalDate.parse("2004-12-12"), new ArrayList<>(), testUser);
+        ownersDao.save(testOwner);
         testCat = new Cat("Tina", "British shorthair", Color.GREY,
                 testOwner, LocalDate.parse("2017-08-04"), new ArrayList<>());
         testOwner.getCats().add(testCat);
-        ownersDao.save(testOwner);
-        testUser = new User(testOwner, "username", "password", new ArrayList<>());
-        usersDao.save(testUser);
         userDetails = new CustomUser(testUser.getId(), testUser.getUsername(), testUser.getPassword(),
                 new ArrayList<>());
     }
@@ -87,18 +87,12 @@ public class CatsControllerTests {
         registry.add("spring.datasource.password", postgres::getPassword);
     }
     @Test
-    public void savingCatTest_ShouldReturn403Status() throws Exception {
-        CustomUser randomUserDetails = new CustomUser(54L,"random", "dontexist",
-                new ArrayList<>());
-        var mapper = JsonMapper.builder()
-                .findAndAddModules()
-                .build();
-        mapper.registerModule(new JavaTimeModule());
-        var request = mapper.writeValueAsString(new CatInfoDto(testCat.getId(), testCat.getName(), testCat.getBreed(),
-                testCat.getColor(), testCat.getOwner().getId(), testCat.getBirthday(), testCat.getFriends().stream().map(Cat::getId).toList()));
-        this.mockMvc.perform(post("/cat").with(user(randomUserDetails)).accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON).content(request))
-                .andExpect(status().isForbidden());
+    public void getCatTest_ShouldReturn403Status() throws Exception {
+        catsDao.save(testCat);
+        var randomUserDetails = new CustomUser(54L, "random", "jk", new ArrayList<>());
+        MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders.get("/cat/{catId}", testCat.getId()).with(user(randomUserDetails))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden()).andReturn();
     }
     @Test
     public void savingCatTest_ShouldReturn200Status() throws Exception {

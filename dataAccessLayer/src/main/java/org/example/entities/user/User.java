@@ -19,9 +19,6 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne(targetEntity = Owner.class)
-    @JoinColumn(name="owner_id")
-    private Owner owner;
     private String password;
     private String username;
     @ManyToMany(targetEntity = Role.class, fetch = FetchType.EAGER)
@@ -32,8 +29,7 @@ public class User {
     )
     private List<Role> authorities;
 
-    public User(Owner owner, String username, String password, List<Role> role) {
-        this.owner = owner;
+    public User(String username, String password, List<Role> role) {
         this.username = username;
         this.password = password;
         this.authorities = role;

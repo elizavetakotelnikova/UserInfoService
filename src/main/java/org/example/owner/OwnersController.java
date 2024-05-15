@@ -32,24 +32,24 @@ public class OwnersController {
         }*/
         var returnedOwner = service.getOwnerById(ownerId);
         if (returnedOwner == null) return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        return new ResponseEntity<>(new OwnerInfoResponse(returnedOwner.getId(), returnedOwner.getBirthday(), returnedOwner.getCats().stream().map(Cat::getId).toList()),
+        return new ResponseEntity<>(new OwnerInfoResponse(returnedOwner.getId(), returnedOwner.getBirthday(), returnedOwner.getCats().stream().map(Cat::getId).toList(),
+                returnedOwner.getUser().getId()),
                 HttpStatus.OK);
     }
     @GetMapping("/owners")
     public ResponseEntity<List<OwnerInfoResponse>> getOwnerByCriteria(@Param("friend") Long catId,
-                                                                      @Param("birthday") LocalDate birthday) {
-        var criteria = new FindCriteria(birthday);
+                                                                      @Param("birthday") LocalDate birthday,
+                                                                      @Param("userId") Long userId) {
+        var criteria = new FindCriteria(birthday, userId);
         var returnedOwner = service.getOwnerByCriteria(criteria);
         if (returnedOwner == null) return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        return new ResponseEntity<>(returnedOwner.stream().map(x -> new OwnerInfoResponse(x.getId(), x.getBirthday(), x.getCats().stream().map(Cat::getId).toList())).toList(), HttpStatus.OK);
+        return new ResponseEntity<>(returnedOwner.stream().map(x -> new OwnerInfoResponse(x.getId(), x.getBirthday(), x.getCats().stream().map(Cat::getId).toList(), x.getUser().getId())).toList(), HttpStatus.OK);
     }
     @PostMapping("/owner")
     public ResponseEntity<OwnerIdResponse> save(@RequestBody OwnerInfoDto dto) {
         try {
+            if (dto.getUserId() == null) dto.setUserId(securityChecker.getUserId());
             var returnedOwner = service.saveOwner(dto);
-            var user = usersService.getUserById(securityChecker.getUserId());
-            user.setOwner(returnedOwner);
-            usersService.updateRegularInfo(new UserInfoDto(user.getId(), user.getUsername(), user.getPassword(), returnedOwner.getId(), user.getAuthorities()));
             return new ResponseEntity<>(new OwnerIdResponse(returnedOwner.getId()),
                     HttpStatus.OK);
         }

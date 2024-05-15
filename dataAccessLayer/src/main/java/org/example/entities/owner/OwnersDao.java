@@ -1,5 +1,6 @@
 package org.example.entities.owner;
 
+import org.example.entities.user.User;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,5 +19,6 @@ public interface OwnersDao extends JpaRepository<Owner, Long> {
     @NotNull List<Owner> findAll();
     Owner findById(long id);
     List<Owner> findByBirthday(LocalDate birthday);
+    Owner findByUser(User user);
     void deleteById(long id);
 }

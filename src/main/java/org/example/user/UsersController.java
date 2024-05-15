@@ -44,8 +44,7 @@ public class UsersController {
         var returnedUser = service.getUserById(userId);
         if (returnedUser == null) return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         Long returnOwnerId = null;
-        if (returnedUser.getOwner() != null) returnOwnerId = returnedUser.getOwner().getId();
-        return new ResponseEntity<>(new UserInfoResponse(returnedUser.getId(), returnOwnerId, returnedUser.getUsername(), returnedUser.getAuthorities()),
+        return new ResponseEntity<>(new UserInfoResponse(returnedUser.getId(), returnedUser.getUsername(), returnedUser.getAuthorities()),
                 HttpStatus.OK);
     }
     @GetMapping("/users")
@@ -55,9 +54,7 @@ public class UsersController {
         if (returnedUser == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         List<UserInfoResponse> responses = new ArrayList<>();
         for (var each : returnedUser) {
-            Long returnOwnerId = null;
-            if (each.getOwner() != null) returnOwnerId = each.getOwner().getId();
-            responses.add(new UserInfoResponse(each.getId(), returnOwnerId, each.getUsername(), each.getAuthorities()));
+            responses.add(new UserInfoResponse(each.getId(), each.getUsername(), each.getAuthorities()));
         }
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }

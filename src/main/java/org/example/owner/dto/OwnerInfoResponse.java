@@ -13,4 +13,5 @@ public class OwnerInfoResponse {
     private Long id;
     private java.time.LocalDate birthday;
     private List<Long> cats;
+    private Long userId;
 }

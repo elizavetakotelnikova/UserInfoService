@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:7778/techlabs
+    url: jdbc:postgresql://localhost:7780/techlabs
     username: postgres
     password: postgres
   main:
@@ -12,7 +12,7 @@ spring:
 
 
 flyway:
-  url: jdbc:postgresql://localhost:7778/techlabs;
+  url: jdbc:postgresql://localhost:7780/techlabs;
   user: postgres
   password: postgres
   enabled: true

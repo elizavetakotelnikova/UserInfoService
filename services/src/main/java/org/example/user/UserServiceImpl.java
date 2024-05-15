@@ -30,11 +30,6 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = passwordEncoder;
     }
     private boolean validateUser(UserInfoDto dto) {
-        if (dto.getOwnerId() != null) {
-            if (ownersDao.findById(dto.getOwnerId()).isEmpty()) {
-                return false;
-            }
-        }
         if (dto.getUsername() == null) return false;
         if (dto.getPassword() == null) return false;
         return true;
@@ -49,16 +44,8 @@ public class UserServiceImpl implements UserService {
             dto.setAuthorities(roles);
         }
         dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-        Owner owner = null;
-        if (dto.getOwnerId() != null) {
-            owner = ownersDao.findById(dto.getOwnerId()).orElse(null);
-        }
-        else {
-            var returnedOwner = ownersDao.save(new Owner(LocalDate.now(), new ArrayList<>()));
-            dto.setOwnerId(returnedOwner.getId());
-        }
         // два варианта, с созданием владельца и без
-        return usersDao.save(new User(owner, dto.getUsername(), dto.getPassword(), dto.getAuthorities()));
+        return usersDao.save(new User(dto.getUsername(), dto.getPassword(), dto.getAuthorities()));
     }
 
     @Override
@@ -74,8 +61,7 @@ public class UserServiceImpl implements UserService {
             dto.setAuthorities(roles);
         }
         dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-        var owner = ownersDao.findById(dto.getOwnerId()).orElse(null);;
-        return usersDao.save(new User(dto.getId(), owner, dto.getPassword(), dto.getUsername(), dto.getAuthorities()));
+        return usersDao.save(new User(dto.getId(), dto.getPassword(), dto.getUsername(), dto.getAuthorities()));
     }
 
     @Override
@@ -97,8 +83,7 @@ public class UserServiceImpl implements UserService {
             roles.add(new org.example.entities.user.Role(Role.ROLE_USER.toString()));
             dto.setAuthorities(roles);
         }
-        var owner = ownersDao.findById(dto.getOwnerId()).orElse(null);;
-        return usersDao.save(new User(dto.getId(), owner, dto.getPassword(), dto.getUsername(), dto.getAuthorities()));
+        return usersDao.save(new User(dto.getId(), dto.getPassword(), dto.getUsername(), dto.getAuthorities()));
     }
 
     @Override

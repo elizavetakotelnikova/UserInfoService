@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.entities.cat.Cat;
 import org.example.entities.cat.CatsDao;
 import org.example.entities.owner.Owner;
+import org.example.entities.owner.OwnersDao;
 import org.example.entities.user.User;
 import org.example.entities.user.UsersDao;
 import org.springframework.security.access.AccessDeniedException;
@@ -18,6 +19,7 @@ import java.util.Objects;
 public class UserIdentitySecurityChecker {
     private final CatsDao catsDao;
     private final UsersDao usersDao;
+    private final OwnersDao ownersDao;
     public static boolean checkIsTheContextUser(Long userId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) {
@@ -43,10 +45,9 @@ public class UserIdentitySecurityChecker {
             throw new AccessDeniedException("Access denied");
         }
         CustomUser details = (CustomUser) auth.getPrincipal();
-        User user = usersDao.findById(details.getId()).orElse(null);
-        if (user == null) throw new AccessDeniedException("Access denied");
-        Owner owner = user.getOwner();
-        if (owner == null || !Objects.equals(ownerId, owner.getId())) {
+        var owner = ownersDao.findById(ownerId).orElse(null);
+        if (owner == null) throw new AccessDeniedException("Access denied");
+        if (!Objects.equals(ownerId, owner.getUser().getId())) {
             throw new AccessDeniedException("Access denied");
         }
         return true;
@@ -60,7 +61,8 @@ public class UserIdentitySecurityChecker {
         Cat cat = catsDao.findById(catId).orElse(null);
         if (cat == null) throw new AccessDeniedException("Access denied");
         User user = usersDao.findById(details.getId()).orElse(null);
-        if (user == null || !Objects.equals(cat.getOwner().getId(), user.getOwner().getId())) {
+        var owner = ownersDao.findByUser(user);
+        if (user == null || owner == null || !Objects.equals(cat.getOwner().getId(), owner.getId())) {
             throw new AccessDeniedException("Access denied");
         }
         return true;
@@ -72,7 +74,8 @@ public class UserIdentitySecurityChecker {
         }
         CustomUser details = (CustomUser) auth.getPrincipal();
         User user = usersDao.findById(details.getId()).get();
-        if (!Objects.equals(cat.getOwner().getId(), user.getOwner().getId())) {
+        var owner = ownersDao.findByUser(user);
+        if (!Objects.equals(cat.getOwner().getId(), owner.getId())) {
             throw new AccessDeniedException("Access denied");
         }
         return true;

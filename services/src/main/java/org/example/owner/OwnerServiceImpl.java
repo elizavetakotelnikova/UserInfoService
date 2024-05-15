@@ -32,14 +32,21 @@ public class OwnerServiceImpl implements OwnerService {
     }
     @Override
     public Owner saveOwner(OwnerInfoDto dto) throws IncorrectArgumentsException {
-        if (dto.getBirthday() == null) throw new IncorrectArgumentsException("Incorrect data provided, unable to create an owner");
+        if (dto.getBirthday() == null || dto.getUserId() == null) throw new IncorrectArgumentsException("Incorrect data provided, unable to create an owner");
         List<Cat> cats = new ArrayList<>();
         if (dto.getCats() != null) cats = dto.getCats().stream().map(x -> catsDao.findById(x.getId()).get()).toList();
-        return ownersDao.save(new Owner(dto.getBirthday(), cats));
+        var user = usersDao.findById(dto.getUserId()).get();
+        return ownersDao.save(new Owner(dto.getBirthday(), cats, user));
     }
      @Override
     public List<Owner> getOwnerByCriteria(FindCriteria criteria) {
         if (criteria.getBirthday() != null) return ownersDao.findByBirthday(criteria.getBirthday());
+        if (criteria.getUserId() != null) {
+            List<Owner> ownersList = new ArrayList<>();
+            var owner = ownersDao.findByUser(usersDao.findById(criteria.getUserId()).orElse(null));
+            ownersList.add(owner);
+            return ownersList;
+        }
         return ownersDao.findAll();
     }
 
@@ -51,16 +58,12 @@ public class OwnerServiceImpl implements OwnerService {
     public Owner update(OwnerInfoDto dto) throws IncorrectArgumentsException {
         if (dto.getBirthday() == null || dto.getId() == null) throw new IncorrectArgumentsException("Incorrect data provided, unable to update an owner");
         var cats = dto.getCats().stream().map(x -> catsDao.findById(x.getId()).get()).toList();
-        return ownersDao.save(new Owner(dto.getId(), dto.getBirthday(), cats));
+        var user = usersDao.findById(dto.getUserId()).get();
+        return ownersDao.save(new Owner(dto.getId(), dto.getBirthday(), cats, user));
     }
 
     @Override
     public void delete(long id) {
-        var returnedOwner =  ownersDao.findById(id);
-        var returnedUser = usersDao.findByOwner(returnedOwner);
-        /*var returnedCat = catsDao.findByOwnerId(id);
-        returnedCat.*/
-        returnedUser.setOwner(null);
         ownersDao.deleteById(id);
     }
 }

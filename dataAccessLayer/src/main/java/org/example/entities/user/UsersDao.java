@@ -11,7 +11,6 @@ import java.util.List;
 public interface UsersDao extends JpaRepository<User, Long> {
     User findById(long id);
     User findByUsername(String username);
-    User findByOwner(Owner owner);
     List<User> findUserByAuthorities(Role role);
     void deleteById(long id);
 }

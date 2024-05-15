@@ -59,8 +59,8 @@ public class CatsController {
     }
     @PostMapping("/cat")
     public ResponseEntity<CatIdResponse> save(@RequestBody CatInfoDto dto) {
-        if (!contextManager.setCurrentOwner(dto)) return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         if (!securityChecker.isAdmin() && !securityChecker.checkIsTheContextOwner(dto.getOwnerId())) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+        if (!contextManager.setCurrentOwner(dto)) return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         Cat returnedCat;
         try {
             returnedCat = service.saveCat(dto);
