@@ -1,10 +1,14 @@
 package org.example;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.example.cat.CatInfoDto;
 import org.example.entities.cat.Cat;
 import org.example.entities.cat.CatsDao;
 import org.example.entities.owner.Owner;
 import org.example.entities.owner.OwnersDao;
 import org.example.entities.user.User;
 import org.example.entities.user.UsersDao;
+import org.example.owner.OwnerInfoDto;
 import org.example.security.CustomUser;
 import org.example.valueObjects.Color;
 import org.junit.jupiter.api.AfterAll;
@@ -84,14 +88,19 @@ public class OwnersControllerTests {
         registry.add("spring.datasource.password", postgres::getPassword);
     }
     @Test
-    public void savingOwnerTest_ShouldReturn200Status() throws Exception {
-        var request = "{\"birthday\" : \"2004-01-30\"}";
+    public void savingOwnerTest_AlreadyExists_ShouldReturn400Status() throws Exception {
+        //var request = "{\"birthday\" : \"2004-01-30\"}";
+        var mapper = JsonMapper.builder()
+                .findAndAddModules()
+                .build();
+        mapper.registerModule(new JavaTimeModule());
+        var request = mapper.writeValueAsString(new OwnerInfoDto(testOwner.getId(), LocalDate.parse("2004-01-30"), new ArrayList<>(), testUser.getId()));
         this.mockMvc.perform(post("/owner").accept(MediaType.APPLICATION_JSON).with(user(userDetails))
                         .contentType(MediaType.APPLICATION_JSON).content(request))
-                .andExpect(status().isOk());
+                .andExpect(status().is4xxClientError());
     }
     @Test
-    public void savingOwnerTest_ShouldReturn400Status() throws Exception {
+    public void savingOwnerTest_ShouldReturn400StatusIncorrectArguments() throws Exception {
         var request = "{\"birthday\" : null}";
         var json = new ObjectMapper().writeValueAsString(request);
         this.mockMvc.perform(post("/owner").with(user(userDetails))
@@ -109,7 +118,7 @@ public class OwnersControllerTests {
     public void getOwnerTest_ShouldReturn400Status() throws Exception {
         MvcResult result = this.mockMvc.perform(MockMvcRequestBuilders.get("/owner/5000").with(user(userDetails))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().is5xxServerError()).andReturn();
+                .andExpect(status().is4xxClientError()).andReturn();
     }
     @Test
     public void deleteOwnerTest_ShouldReturn200Status() throws Exception {

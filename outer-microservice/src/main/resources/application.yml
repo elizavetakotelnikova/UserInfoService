@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:7780/techlabs
+    username: postgres
+    password: postgres
+  main:
+    allow-bean-definition-overriding: true
+  rabbitmq:
+      host: localhost
+      port: 5672
+      username: guest
+      password: guest
+logging:
+  level:
+       org.springframework.security: trace
+security.basic.enable: false
+  security.ignored=/**

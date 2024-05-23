@@ -9,8 +9,66 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/dataAccessLayer" />
-            <option value="$PROJECT_DIR$/services" />
+            <option value="$PROJECT_DIR$/JPA" />
+            <option value="$PROJECT_DIR$/cat-microservice" />
+            <option value="$PROJECT_DIR$/outer-microservice" />
+            <option value="$PROJECT_DIR$/owner-microservice" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/JPA" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/JPA" />
+            <option value="$PROJECT_DIR$/cat-microservice" />
+            <option value="$PROJECT_DIR$/outer-microservice" />
+            <option value="$PROJECT_DIR$/owner-microservice" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/cat-microservice" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/JPA" />
+            <option value="$PROJECT_DIR$/cat-microservice" />
+            <option value="$PROJECT_DIR$/outer-microservice" />
+            <option value="$PROJECT_DIR$/owner-microservice" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/outer-microservice" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/JPA" />
+            <option value="$PROJECT_DIR$/cat-microservice" />
+            <option value="$PROJECT_DIR$/outer-microservice" />
+            <option value="$PROJECT_DIR$/owner-microservice" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/owner-microservice" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/JPA" />
+            <option value="$PROJECT_DIR$/cat-microservice" />
+            <option value="$PROJECT_DIR$/outer-microservice" />
+            <option value="$PROJECT_DIR$/owner-microservice" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/web-microservice" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/web-microservice" />
           </set>
         </option>
       </GradleProjectSettings>

@@ -1,4 +1,5 @@
 rootProject.name = 'TechLabsITMO'
-include 'services'
-include 'dataAccessLayer'
-
+include 'JPA'
+include 'owner-microservice'
+include 'cat-microservice'
+include 'outer-microservice'

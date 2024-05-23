@@ -10,8 +10,8 @@ plugins {
     id 'java'
     id("org.flywaydb.flyway") version "10.10.0"
     id("org.hibernate.orm") version "6.4.4.Final"
-    id 'org.springframework.boot' version '3.2.4'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'org.springframework.boot' version '3.2.5'
+    id 'io.spring.dependency-management' version '1.1.4'
 }
 
 group = 'org.example'
@@ -39,8 +39,6 @@ dependencies {
     testImplementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.9'
     testImplementation 'org.springframework.security:spring-security-test'
     implementation('com.github.dozermapper:dozer-core:6.5.2')
-    implementation project(':dataAccessLayer')
-    implementation project(':services')
 }
 flyway {
     url = 'jdbc:postgresql://localhost:7777/techlabs';

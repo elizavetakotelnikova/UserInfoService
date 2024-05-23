@@ -38,8 +38,7 @@ public class OwnersController {
     }
     @GetMapping("/owners")
     public ResponseEntity<List<OwnerInfoResponse>> getOwnerByCriteria(@Param("friend") Long catId,
-                                                                      @Param("birthday") LocalDate birthday,
-                                                                      @Param("userId") Long userId) {
+                                                                      @Param("birthday") LocalDate birthday, @Param("userId") Long userId) {
         var criteria = new FindCriteria(birthday, userId);
         var returnedOwner = service.getOwnerByCriteria(criteria);
         if (returnedOwner == null) return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

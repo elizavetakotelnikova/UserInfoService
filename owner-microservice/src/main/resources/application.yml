@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:7780/techlabs
+    username: postgres
+    password: postgres
+  main:
+    allow-bean-definition-overriding: true
+  logging.level.org.springframework.security: trace
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+server:
+  port: 8090
+
+flyway:
+  url: jdbc:postgresql://localhost:7780/techlabs;
+  user: postgres
+  password: postgres
+  enabled: true
+  locations:
+    - 'classpath:db/migration'
+
+security.basic.enable: false
+  security.ignored=/**

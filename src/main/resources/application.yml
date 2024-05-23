@@ -9,8 +9,6 @@ spring:
   logging.level.org.springframework.security: trace
 
 
-
-
 flyway:
   url: jdbc:postgresql://localhost:7780/techlabs;
   user: postgres
