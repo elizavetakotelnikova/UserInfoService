@@ -2,19 +2,21 @@ package com.example.ownermicroservice.services;
 
 import com.example.jpa.Cat;
 import com.example.jpa.Owner;
+import com.example.jpa.OwnerMessagingDto;
+import com.example.jpa.RabbitMQConfig;
 import com.example.ownermicroservice.exceptions.IncorrectArgumentsException;
 import com.example.ownermicroservice.models.OwnerInfoDto;
-import com.example.ownermicroservice.rabbitMQ.RabbitMQConfig;
 import com.example.ownermicroservice.repositories.FindCriteria;
 import com.example.ownermicroservice.repositories.OwnersDao;
-import org.springframework.amqp.rabbit.annotation.EnableRabbit;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@ComponentScan("com.example.jpa.*")
 @EnableRabbit
 public class OwnerServiceImpl implements OwnerService {
     private final OwnersDao ownersDao;
@@ -23,7 +25,7 @@ public class OwnerServiceImpl implements OwnerService {
         this.ownersDao = ownersDao;
     }
     @Override
-    @RabbitListener(queues = RabbitMQConfig.CREATING_OWNER_QUEUE)
+    @RabbitListener(queues = RabbitMQConfig.CREATING_OWNER_QUEUE, errorHandler = "rabErrorHandler")
     public Owner saveOwner(OwnerInfoDto dto) throws IncorrectArgumentsException {
         if (dto.getBirthday() == null || dto.getUser() == null) throw new IncorrectArgumentsException("Incorrect data provided, unable to create an owner");
         if (ownersDao.findByUser(dto.getUser()) != null) throw new IncorrectArgumentsException("Incorrect data provided, owner with same userId already exists");
@@ -45,8 +47,9 @@ public class OwnerServiceImpl implements OwnerService {
 
     @Override
     @RabbitListener(queues = RabbitMQConfig.FIND_OWNER_QUEUE)
-    public Owner getOwnerById(long id) {
-        return ownersDao.findById(id);
+    public OwnerMessagingDto getOwnerById(long id) {
+        var owner = ownersDao.findById(id);
+        return new OwnerMessagingDto(owner.getId(), owner.getBirthday(), owner.getCats(), owner.getUser());
     }
     @Override
     @RabbitListener(queues = RabbitMQConfig.UPDATING_OWNER_QUEUE)

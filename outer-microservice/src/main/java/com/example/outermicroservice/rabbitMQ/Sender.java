@@ -1,5 +1,6 @@
 package com.example.outermicroservice.rabbitMQ;
 
+import com.example.jpa.RabbitMQConfig;
 import com.example.outermicroservice.cat.dto.CatInfoDto;
 import com.example.outermicroservice.owner.dto.OwnerInfoDto;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

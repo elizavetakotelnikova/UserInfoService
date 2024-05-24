@@ -1,4 +1,4 @@
-package com.example.outermicroservice.owner.dto;
+package com.example.jpa;
 
 import com.example.jpa.Cat;
 import com.example.jpa.User;

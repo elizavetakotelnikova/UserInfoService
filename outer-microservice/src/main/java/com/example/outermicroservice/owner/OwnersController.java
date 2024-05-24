@@ -1,11 +1,11 @@
 package com.example.outermicroservice.owner;
 
 import com.example.jpa.Cat;
+import com.example.jpa.RabbitMQConfig;
 import com.example.outermicroservice.owner.dto.OwnerIdResponse;
 import com.example.outermicroservice.owner.dto.OwnerInfoDto;
 import com.example.outermicroservice.owner.dto.OwnerInfoResponse;
-import com.example.outermicroservice.owner.dto.OwnerMessagingDto;
-import com.example.outermicroservice.rabbitMQ.RabbitMQConfig;
+import com.example.jpa.OwnerMessagingDto;
 import com.example.outermicroservice.rabbitMQ.Sender;
 import com.example.outermicroservice.security.UserIdentitySecurityChecker;
 import com.example.outermicroservice.owner.dto.FindCriteria;
@@ -33,7 +33,7 @@ public class OwnersController {
         if (!securityChecker.isAdmin() && !securityChecker.checkIsTheContextOwner(ownerId)) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
-        var returnedOwner = (OwnerMessagingDto) rabbitTemplate.convertSendAndReceive(RabbitMQConfig.ROUTING_KEY_FINDING_OWNER, ownerId);
+        var returnedOwner = (OwnerMessagingDto) rabbitTemplate.convertSendAndReceive(RabbitMQConfig.WEB_EXCHANGE, RabbitMQConfig.ROUTING_KEY_FINDING_OWNER, ownerId);
         if (returnedOwner == null) return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         return new ResponseEntity<>(new OwnerInfoResponse(returnedOwner.getId(), returnedOwner.getBirthday(), returnedOwner.getCats().stream().map(Cat::getId).toList(),
                 returnedOwner.getUser().getId()),
@@ -44,7 +44,7 @@ public class OwnersController {
                                                                       @Param("birthday") LocalDate birthday, @Param("userId") Long userId) {
         var user = usersService.getUserById(userId);
         var criteria = new FindCriteria(birthday, user);
-        var returnedOwner = (List<OwnerMessagingDto>) rabbitTemplate.convertSendAndReceive(RabbitMQConfig.ROUTING_KEY_FINDING_OWNER_BY_CRITERIA, criteria);
+        var returnedOwner = (List<OwnerMessagingDto>) rabbitTemplate.convertSendAndReceive(RabbitMQConfig.WEB_EXCHANGE, RabbitMQConfig.ROUTING_KEY_FINDING_OWNER_BY_CRITERIA, criteria);
         if (returnedOwner == null) return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         return new ResponseEntity<>(returnedOwner.stream().map(x -> new OwnerInfoResponse(x.getId(), x.getBirthday(), x.getCats().stream().map(Cat::getId).toList(), x.getUser().getId())).toList(), HttpStatus.OK);
     }
@@ -57,7 +57,7 @@ public class OwnersController {
             /*var returnedOwner = service.saveOwner(dto);
             return new ResponseEntity<>(new OwnerIdResponse(returnedOwner.getId()),
                     HttpStatus.OK);*/
-            rabbitTemplate.convertAndSend(RabbitMQConfig.ROUTING_KEY_CREATING_OWNER, messagingDto);
+            rabbitTemplate.convertAndSend(RabbitMQConfig.WEB_EXCHANGE, RabbitMQConfig.ROUTING_KEY_CREATING_OWNER, messagingDto);
         }
         catch (Exception e) {
             return new ResponseEntity<>(null,
@@ -75,7 +75,7 @@ public class OwnersController {
         if (dto.getId() == null) dto.setId(ownerId);
         var returnedUser = usersService.getUserById(dto.getUserId());
         var messagingDto = new OwnerMessagingDto(dto.getId(), dto.getBirthday(), dto.getCats(), returnedUser);
-        rabbitTemplate.convertAndSend(RabbitMQConfig.ROUTING_KEY_UPDATING_OWNER, messagingDto);
+        rabbitTemplate.convertAndSend(RabbitMQConfig.WEB_EXCHANGE, RabbitMQConfig.ROUTING_KEY_UPDATING_OWNER, messagingDto);
         /*Owner returnedOwner;
         try {
             returnedOwner = service.update(dto);

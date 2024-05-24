@@ -1,13 +1,23 @@
 package com.example.jpa;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.api.RabbitListenerErrorHandler;
+import org.springframework.amqp.rabbit.retry.RepublishMessageRecoverer;
+import org.springframework.amqp.rabbit.support.ListenerExecutionFailedException;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.amqp.SimpleRabbitListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 
 
 @Configuration
@@ -25,6 +35,10 @@ public class RabbitMQConfig {
     public static final String ROUTING_KEY_FINDING_OWNER = "owner_finding";
     public static final String ROUTING_KEY_FINDING_OWNER_BY_CRITERIA = "owner_criteria_finding";
     public static final String ROUTING_KEY_DELETING_OWNER = "owner_deleting";
+    @Bean
+    public ConnectionFactory connectionFactory(){
+        return new CachingConnectionFactory("localhost");
+    }
     @Bean
     public TopicExchange topicExchange() {
         return new TopicExchange(WEB_EXCHANGE);
@@ -90,10 +104,29 @@ public class RabbitMQConfig {
         application.setAllowBeanDefinitionOverriding(true);
     }
     @Bean
-    public AmqpTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
-        final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+    public AmqpTemplate rabbitTemplate() {
+        final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory());
         rabbitTemplate.setMessageConverter(jsonMessageConverter());
+        //rabbitTemplate.setExchange(WEB_EXCHANGE);
         return rabbitTemplate;
+    }
+    /*@Bean(name = "pimAmqpAdmin")
+    public AmqpAdmin pimAmqpAdmin() {
+        return new RabbitAdmin(connectionFactory());
+    }*/
+    @Bean
+    public AmqpAdmin amqpAdmin() {
+        return new RabbitAdmin(connectionFactory());
+    }
+    @Bean
+    public RabbitListenerErrorHandler rabErrorHandler(){
+        return new RabbitListenerErrorHandler() {
+            @Override
+            public Object handleError(Message message, org.springframework.messaging.Message<?> message1, ListenerExecutionFailedException e) throws Exception {
+                System.out.println("meow");
+                return null;
+            }
+        };
     }
     /*@Bean
     MessageListenerAdapter listenerAdapter(Receiver receiver) {

@@ -1,8 +1,7 @@
 package com.example.outermicroservice.security;
 import com.example.jpa.*;
 import com.example.outermicroservice.owner.dto.FindCriteria;
-import com.example.outermicroservice.owner.dto.OwnerMessagingDto;
-import com.example.outermicroservice.rabbitMQ.RabbitMQConfig;
+import com.example.jpa.OwnerMessagingDto;
 import com.example.outermicroservice.user.services.UsersDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

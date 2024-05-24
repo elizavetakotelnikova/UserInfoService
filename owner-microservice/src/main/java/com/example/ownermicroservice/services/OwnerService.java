@@ -1,5 +1,6 @@
 package com.example.ownermicroservice.services;
 
+import com.example.jpa.OwnerMessagingDto;
 import com.example.ownermicroservice.exceptions.IncorrectArgumentsException;
 import com.example.ownermicroservice.models.OwnerInfoDto;
 import com.example.jpa.Owner;
@@ -11,7 +12,7 @@ public interface OwnerService {
     Owner saveOwner(OwnerInfoDto dto) throws IncorrectArgumentsException;
     //boolean checkIfOwnersAreFriends(long firstId, long secondId);
     List<Owner> getOwnerByCriteria(FindCriteria criteria);
-    Owner getOwnerById(long id);
+    OwnerMessagingDto getOwnerById(long id);
     Owner update(OwnerInfoDto dto) throws IncorrectArgumentsException;
     void delete(long id);
 }

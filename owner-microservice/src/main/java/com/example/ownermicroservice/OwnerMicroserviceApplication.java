@@ -7,9 +7,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Component;
 
-@EnableJpaRepositories("com.example.jpa")
-@ComponentScan(basePackages = { "com.example.jpa" })
-@EntityScan("com.example.jpa.*")
+@EnableJpaRepositories("com.*")
+@ComponentScan(basePackages = { "com.*" })
+@EntityScan("com.*")
 @SpringBootApplication
 public class OwnerMicroserviceApplication {
     public static void main(String[] args) {
