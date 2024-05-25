@@ -1,7 +1,7 @@
 package com.example.outermicroservice.owner;
 
 import com.example.jpa.Cat;
-import com.example.jpa.RabbitMQConfig;
+import com.example.outermicroservice.rabbitMQ.RabbitMQConfig;
 import com.example.jpa.User;
 import com.example.outermicroservice.exceptions.IncorrectArgumentsException;
 import com.example.outermicroservice.owner.dto.OwnerIdResponse;

@@ -1,19 +1,21 @@
 package com.example.catmicroservice.services;
 import com.example.catmicroservice.exceptions.IncorrectArgumentsException;
-import com.example.catmicroservice.models.CatInfoDto;
 import com.example.catmicroservice.repositories.CatsDao;
 import com.example.catmicroservice.valueObjects.FindCriteria;
 import com.example.jpa.Cat;
 import com.example.jpa.CatDto;
-import com.example.jpa.RabbitMQConfig;
+import com.example.catmicroservice.rabbitMQ.RabbitMQConfig;
+import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
+@EnableRabbit
+@ComponentScan("com.example.jpa.*")
 @Service
 public class CatServiceImpl implements CatService {
     private final CatsDao catsDao;
@@ -26,9 +28,12 @@ public class CatServiceImpl implements CatService {
     @Override
     @RabbitListener(queues = RabbitMQConfig.CREATING_CAT_QUEUE, errorHandler = "rabErrorHandler")
     public CatDto saveCat(CatDto dto) throws IncorrectArgumentsException {
+        System.out.println("k;;");
         if (dto.getName() != null && dto.getBirthday() != null && dto.getBreed() != null && dto.getOwner() != null) {
             var friends = dto.getFriendsId().stream().map(x -> catsDao.findById(x).stream().findFirst().orElse(null)).toList();
             var returnedCat = catsDao.save(new Cat(dto.getName(), dto.getBreed(), dto.getColor(), dto.getOwner(), dto.getBirthday(), friends));
+            System.out.println(returnedCat);
+            System.out.println(dto);
             return new CatDto(returnedCat.getId(), returnedCat.getName(),
                     returnedCat.getBreed(), returnedCat.getColor(), returnedCat.getOwner(),
                     returnedCat.getBirthday(), returnedCat.getFriends().stream().map(Cat::getId).toList());

@@ -1,7 +1,10 @@
 package com.example.outermicroservice.cat;
 import com.example.jpa.CatDto;
 import com.example.jpa.Color;
-import com.example.jpa.RabbitMQConfig;
+import com.example.jpa.Owner;
+import com.example.jpa.OwnerDto;
+import com.example.outermicroservice.exceptions.IncorrectArgumentsException;
+import com.example.outermicroservice.rabbitMQ.RabbitMQConfig;
 import com.example.outermicroservice.cat.dto.CatCreateResponse;
 import com.example.outermicroservice.cat.dto.CatIdResponse;
 import com.example.outermicroservice.cat.dto.CatInfoDto;
@@ -63,30 +66,46 @@ public class CatsController {
         if (!securityChecker.isAdmin() && !securityChecker.checkIsTheContextOwner(dto.getOwnerId()))
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
-        CatDto returnedCat;
         try {
-            returnedCat = (CatDto) rabbitTemplate.convertSendAndReceive(RabbitMQConfig.WEB_EXCHANGE,
-                    RabbitMQConfig.ROUTING_KEY_CREATING_CAT, dto);
+            var owner = (OwnerDto) rabbitTemplate.convertSendAndReceive(RabbitMQConfig.WEB_EXCHANGE,
+                    RabbitMQConfig.ROUTING_KEY_FINDING_OWNER, dto.getOwnerId());
+            System.out.println(owner);
+
+            var messagingDto = new CatDto(dto.getId(), dto.getName(), dto.getBreed(),
+                    dto.getColor(), new Owner(owner.getId(), owner.getBirthday(), owner.getCats(),
+                    owner.getUser()), dto.getBirthday(), dto.getFriendsId());
+            System.out.println(messagingDto);
+
+            var returnedCat = (CatDto) rabbitTemplate.convertSendAndReceive(RabbitMQConfig.WEB_EXCHANGE,
+                    RabbitMQConfig.ROUTING_KEY_CREATING_CAT, messagingDto);
+            if (returnedCat == null) throw new IncorrectArgumentsException("Invalid data provided");
+
+            return new ResponseEntity<>(new CatIdResponse(returnedCat.getId()), HttpStatus.OK);
         }
         catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(new CatIdResponse(returnedCat.getId()), HttpStatus.OK);
     }
     @PutMapping("/cat/{catId}")
     public ResponseEntity<CatIdResponse> update(@RequestBody CatInfoDto dto, @PathVariable long catId) {
         if (!securityChecker.isAdmin() && !securityChecker.checkContextOwnerForCat(catId)) return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         if (dto.getId() == null) dto.setId(catId);
         if (!contextManager.setCurrentOwner(dto)) return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        CatDto updatedCat;
         try {
-            updatedCat = (CatDto) rabbitTemplate.convertSendAndReceive(RabbitMQConfig.WEB_EXCHANGE,
-                    RabbitMQConfig.ROUTING_KEY_UPDATING_OWNER, dto);
+            var owner = (OwnerDto) rabbitTemplate.convertSendAndReceive(RabbitMQConfig.WEB_EXCHANGE,
+                    RabbitMQConfig.ROUTING_KEY_FINDING_OWNER, dto.getOwnerId());
+
+            var messagingDto = new CatDto(dto.getId(), dto.getName(), dto.getBreed(),
+                    dto.getColor(), new Owner(owner.getId(), owner.getBirthday(), owner.getCats(),
+                    owner.getUser()), dto.getBirthday(), dto.getFriendsId());
+
+            var updatedCat = (CatDto) rabbitTemplate.convertSendAndReceive(RabbitMQConfig.WEB_EXCHANGE,
+                    RabbitMQConfig.ROUTING_KEY_UPDATING_OWNER, messagingDto);
+            return new ResponseEntity<>(new CatIdResponse(updatedCat.getId()), HttpStatus.OK);
         }
         catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(new CatIdResponse(updatedCat.getId()), HttpStatus.OK);
     }
     @DeleteMapping("/cat/{catId}")
     public void delete(@PathVariable long catId) {

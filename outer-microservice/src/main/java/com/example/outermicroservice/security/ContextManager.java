@@ -1,6 +1,6 @@
 package com.example.outermicroservice.security;
 
-import com.example.jpa.RabbitMQConfig;
+import com.example.outermicroservice.rabbitMQ.RabbitMQConfig;
 import com.example.outermicroservice.owner.dto.FindCriteria;
 import com.example.jpa.OwnerDto;
 import com.example.outermicroservice.user.services.UserService;
@@ -23,8 +23,8 @@ public class ContextManager {
             var currentUser = securityChecker.getUserId();
             var user = userService.getUserById(currentUser);
             var findCriteria = new FindCriteria(null, user);
-            var owner = (List<OwnerDto>) rabbitTemplate.convertSendAndReceive(RabbitMQConfig.ROUTING_KEY_FINDING_OWNER_BY_CRITERIA, findCriteria);
-            if (owner.isEmpty() || owner.getFirst() == null) return false;
+            var owner = (List<OwnerDto>) rabbitTemplate.convertSendAndReceive(RabbitMQConfig.WEB_EXCHANGE, RabbitMQConfig.ROUTING_KEY_FINDING_OWNER_BY_CRITERIA, findCriteria);
+            if (owner == null || owner.isEmpty() || owner.getFirst() == null) return false;
             dto.setOwnerId(owner.getFirst().getId());
         }
         return true;

@@ -1,4 +1,4 @@
-/*package com.example.jpa;
+package com.example.ownermicroservice.rabbitMQ;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -16,6 +16,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @Configuration
 public class RabbitMQConfig {
     public static final String WEB_EXCHANGE = "web_exchange";
+    //public static final String OWNER_CAT_EXCHANGE = "owner_cat_exchange";
     // queues
     public static final String FIND_OWNER_QUEUE = "finding_owner_queue";
     public static final String FIND_OWNER_BY_CRITERIA_OWNER_QUEUE = "find_owner_by_criteria_queue";
@@ -27,17 +28,7 @@ public class RabbitMQConfig {
     public static final String ROUTING_KEY_FINDING_OWNER = "owner_finding";
     public static final String ROUTING_KEY_FINDING_OWNER_BY_CRITERIA = "owner_criteria_finding";
     public static final String ROUTING_KEY_DELETING_OWNER = "owner_deleting";
-
-    public static final String FIND_CAT_QUEUE = "finding_cat_queue";
-    public static final String FIND_CAT_BY_CRITERIA_QUEUE = "find_cat_by_criteria_queue";
-    public static final String CREATING_CAT_QUEUE = "creating_cat_queue";
-    public static final String UPDATING_CAT_QUEUE = "updating_cat_queue";
-    public static final String DELETING_CAT_QUEUE = "deleting_cat_queue";
-    public static final String ROUTING_KEY_CREATING_CAT = "cat_creating";
-    public static final String ROUTING_KEY_UPDATING_CAT = "cat_updating";
-    public static final String ROUTING_KEY_FINDING_CAT = "cat_finding";
-    public static final String ROUTING_KEY_FINDING_CAT_BY_CRITERIA = "cat_criteria_finding";
-    public static final String ROUTING_KEY_DELETING_CAT = "cat_deleting";
+    public static final String FIND_OWNER_FROM_CAT_SERVICE_QUEUE = "finding_owner_queue";
     @Bean
     public ConnectionFactory connectionFactory(){
         return new CachingConnectionFactory("localhost");
@@ -46,6 +37,10 @@ public class RabbitMQConfig {
     public TopicExchange topicExchange() {
         return new TopicExchange(WEB_EXCHANGE);
     }
+    /*@Bean
+    public TopicExchange catOwnersMicroserviceExchange() {
+        return new TopicExchange(OWNER_CAT_EXCHANGE);
+    }*/
     @Bean
     public Queue webFindOwnerQueue() {
         return new Queue(FIND_OWNER_QUEUE);
@@ -68,27 +63,6 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Queue webFindCatQueue() {
-        return new Queue(FIND_CAT_QUEUE);
-    }
-    @Bean
-    public Queue webFindCatsQueue() {
-        return new Queue(FIND_CAT_BY_CRITERIA_QUEUE);
-    }
-    @Bean
-    public Queue webCreatingCatQueue() {
-        return new Queue(CREATING_CAT_QUEUE);
-    }
-    @Bean
-    public Queue webUpdatingCatQueue() {
-        return new Queue(UPDATING_CAT_QUEUE);
-    }
-    @Bean
-    public Queue webDeletingCatQueue() {
-        return new Queue(DELETING_CAT_QUEUE);
-    }
-
-    @Bean
     Binding bindingOwnersFinding() {
         return BindingBuilder.bind(webFindOwnerQueue()).to(topicExchange()).with(ROUTING_KEY_FINDING_OWNER);
     }
@@ -108,27 +82,6 @@ public class RabbitMQConfig {
     Binding bindingOwnersDeleting() {
         return BindingBuilder.bind(webDeletingOwnerQueue()).to(topicExchange()).with(ROUTING_KEY_DELETING_OWNER);
     }
-
-    @Bean
-    Binding bindingCatsFinding() {
-        return BindingBuilder.bind(webFindCatQueue()).to(topicExchange()).with(ROUTING_KEY_FINDING_CAT);
-    }
-    @Bean
-    Binding bindingFindingCriteriaCatCreating() {
-        return BindingBuilder.bind(webFindCatQueue()).to(topicExchange()).with(ROUTING_KEY_FINDING_CAT_BY_CRITERIA);
-    }
-    @Bean
-    Binding bindingCatsCreating() {
-        return BindingBuilder.bind(webCreatingCatQueue()).to(topicExchange()).with(ROUTING_KEY_CREATING_CAT);
-    }
-    @Bean
-    Binding bindingCatsUpdating() {
-        return BindingBuilder.bind(webUpdatingCatQueue()).to(topicExchange()).with(ROUTING_KEY_UPDATING_CAT);
-    }
-    @Bean
-    Binding bindingCatsDeleting() {
-        return BindingBuilder.bind(webDeletingCatQueue()).to(topicExchange()).with(ROUTING_KEY_DELETING_CAT);
-    }
     @Bean
     public MessageConverter jsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
@@ -136,6 +89,10 @@ public class RabbitMQConfig {
     public void postProcessEnvironment(final ConfigurableEnvironment environment, final SpringApplication application) {
         application.setAllowBeanDefinitionOverriding(true);
     }
+    /*@Bean
+    Binding bindingOwnersFindingFromCatsService() {
+        return BindingBuilder.bind(webFindOwnerQueue()).to(catOwnersMicroserviceExchange()).with(ROUTING_KEY_FINDING_OWNER);
+    }*/
     @Bean
     public AmqpTemplate rabbitTemplate() {
         final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory());
@@ -158,4 +115,4 @@ public class RabbitMQConfig {
         };
     }
 
-}*/
+}

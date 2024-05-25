@@ -9,7 +9,8 @@ spring:
   logging.level.org.springframework.security: trace
 
 
-
+server:
+  port: 8070
 
 flyway:
   url: jdbc:postgresql://localhost:7780/techlabs;

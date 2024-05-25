@@ -1,4 +1,4 @@
-/*package com.example.jpa;
+package com.example.outermicroservice.rabbitMQ;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -16,6 +16,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @Configuration
 public class RabbitMQConfig {
     public static final String WEB_EXCHANGE = "web_exchange";
+    //public static final String OWNER_CAT_EXCHANGE = "owner_cat_exchange";
     // queues
     public static final String FIND_OWNER_QUEUE = "finding_owner_queue";
     public static final String FIND_OWNER_BY_CRITERIA_OWNER_QUEUE = "find_owner_by_criteria_queue";
@@ -46,6 +47,10 @@ public class RabbitMQConfig {
     public TopicExchange topicExchange() {
         return new TopicExchange(WEB_EXCHANGE);
     }
+    /*@Bean
+    public TopicExchange catOwnersMicroserviceExchange() {
+        return new TopicExchange(OWNER_CAT_EXCHANGE);
+    }*/
     @Bean
     public Queue webFindOwnerQueue() {
         return new Queue(FIND_OWNER_QUEUE);
@@ -136,6 +141,10 @@ public class RabbitMQConfig {
     public void postProcessEnvironment(final ConfigurableEnvironment environment, final SpringApplication application) {
         application.setAllowBeanDefinitionOverriding(true);
     }
+    /*@Bean
+    Binding bindingOwnersFindingFromCatsService() {
+        return BindingBuilder.bind(webFindOwnersQueue()).to(catOwnersMicroserviceExchange()).with(ROUTING_KEY_FINDING_OWNER);
+    }*/
     @Bean
     public AmqpTemplate rabbitTemplate() {
         final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory());
@@ -158,4 +167,4 @@ public class RabbitMQConfig {
         };
     }
 
-}*/
+}
