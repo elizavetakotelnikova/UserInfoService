@@ -1,21 +1,20 @@
-package org.example.cat.dto;
+package com.example.jpa;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.valueObjects.Color;
 
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CatCreateResponse {
+public class CatDto {
     private Long id;
     private String name;
     private String breed;
     private Color color;
-    private Long ownerId;
+    private Owner owner;
     private java.time.LocalDate birthday;
-    private List<Long> friends;
+    private List<Long> friendsId;
 }

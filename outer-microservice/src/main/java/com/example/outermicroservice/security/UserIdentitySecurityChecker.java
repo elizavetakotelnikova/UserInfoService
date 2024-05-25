@@ -49,22 +49,25 @@ public class UserIdentitySecurityChecker {
         }
         return true;
     }
-    /*public boolean checkContextOwnerForCat(Long catId) {
+    public boolean checkContextOwnerForCat(Long catId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) {
             throw new AccessDeniedException("Access denied");
         }
         CustomUser details = (CustomUser) auth.getPrincipal();
-        Cat cat = catsDao.findById(catId).orElse(null);
+
+        CatDto cat = (CatDto) rabbitTemplate.convertSendAndReceive(RabbitMQConfig.WEB_EXCHANGE,
+                RabbitMQConfig.ROUTING_KEY_FINDING_CAT, catId);
         if (cat == null) throw new AccessDeniedException("Access denied");
         User user = usersDao.findById(details.getId()).orElse(null);
         var findCriteria = new FindCriteria(null, user);
-        var owner = (OwnerMessagingDto) rabbitTemplate.convertSendAndReceive(RabbitMQConfig.ROUTING_KEY_FINDING_OWNER_BY_CRITERIA, findCriteria);
+
+        var owner = (OwnerDto) rabbitTemplate.convertSendAndReceive(RabbitMQConfig.WEB_EXCHANGE, RabbitMQConfig.ROUTING_KEY_FINDING_OWNER_BY_CRITERIA, findCriteria);
         if (user == null || owner == null || !Objects.equals(cat.getOwner().getId(), owner.getId())) {
             throw new AccessDeniedException("Access denied");
         }
         return true;
-    }*/
+    }
     public boolean checkContextOwnerForCat(Cat cat) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) {
