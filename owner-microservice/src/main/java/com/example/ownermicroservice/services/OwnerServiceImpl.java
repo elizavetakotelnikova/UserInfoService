@@ -2,7 +2,7 @@ package com.example.ownermicroservice.services;
 
 import com.example.jpa.Cat;
 import com.example.jpa.Owner;
-import com.example.jpa.OwnerMessagingDto;
+import com.example.jpa.OwnerDto;
 import com.example.jpa.RabbitMQConfig;
 import com.example.ownermicroservice.exceptions.IncorrectArgumentsException;
 import com.example.ownermicroservice.models.OwnerInfoDto;
@@ -26,36 +26,44 @@ public class OwnerServiceImpl implements OwnerService {
     }
     @Override
     @RabbitListener(queues = RabbitMQConfig.CREATING_OWNER_QUEUE, errorHandler = "rabErrorHandler")
-    public Owner saveOwner(OwnerInfoDto dto) throws IncorrectArgumentsException {
+    public OwnerDto saveOwner(OwnerDto dto) throws IncorrectArgumentsException {
         if (dto.getBirthday() == null || dto.getUser() == null) throw new IncorrectArgumentsException("Incorrect data provided, unable to create an owner");
         if (ownersDao.findByUser(dto.getUser()) != null) throw new IncorrectArgumentsException("Incorrect data provided, owner with same userId already exists");
         List<Cat> cats = new ArrayList<>();
-        return ownersDao.save(new Owner(dto.getBirthday(), cats, dto.getUser()));
+        var owner = ownersDao.save(new Owner(dto.getBirthday(), cats, dto.getUser()));
+        return new OwnerDto(owner.getId(), owner.getBirthday(), owner.getCats(),owner.getUser());
     }
      @Override
-     @RabbitListener(queues = RabbitMQConfig.FIND_OWNER_BY_CRITERIA_OWNER_QUEUE)
-    public List<Owner> getOwnerByCriteria(FindCriteria criteria) {
-        if (criteria.getBirthday() != null) return ownersDao.findByBirthday(criteria.getBirthday());
-        if (criteria.getUser() != null) {
-            List<Owner> ownersList = new ArrayList<>();
-            var owner = ownersDao.findByUser(criteria.getUser());
-            ownersList.add(owner);
-            return ownersList;
+     @RabbitListener(queues = RabbitMQConfig.FIND_OWNER_BY_CRITERIA_OWNER_QUEUE, errorHandler = "rabErrorHandler")
+    public List<OwnerDto> getOwnerByCriteria(FindCriteria criteria) {
+        List<Owner> owners = new ArrayList<>();
+        if (criteria.getBirthday() != null) {
+            owners = ownersDao.findByBirthday(criteria.getBirthday());
         }
-        return ownersDao.findAll();
+        else if (criteria.getUser() != null) {
+            var owner = ownersDao.findByUser(criteria.getUser());
+            owners.add(owner);
+        }
+        else {
+            owners = ownersDao.findAll();
+        }
+         return owners.stream().map(x -> new OwnerDto(x.getId(), x.getBirthday(),
+                x.getCats(), x.getUser())).toList();
     }
 
     @Override
     @RabbitListener(queues = RabbitMQConfig.FIND_OWNER_QUEUE)
-    public OwnerMessagingDto getOwnerById(long id) {
+    public OwnerDto getOwnerById(long id) {
         var owner = ownersDao.findById(id);
-        return new OwnerMessagingDto(owner.getId(), owner.getBirthday(), owner.getCats(), owner.getUser());
+        if (owner == null) return null;
+        return new OwnerDto(owner.getId(), owner.getBirthday(), owner.getCats(), owner.getUser());
     }
     @Override
     @RabbitListener(queues = RabbitMQConfig.UPDATING_OWNER_QUEUE)
-    public Owner update(OwnerInfoDto dto) throws IncorrectArgumentsException {
+    public OwnerDto update(OwnerDto dto) throws IncorrectArgumentsException {
         if (dto.getBirthday() == null || dto.getId() == null) throw new IncorrectArgumentsException("Incorrect data provided, unable to update an owner");
-        return ownersDao.save(new Owner(dto.getId(), dto.getBirthday(), dto.getCats(), dto.getUser()));
+        var owner = ownersDao.save(new Owner(dto.getId(), dto.getBirthday(), dto.getCats(), dto.getUser()));
+        return new OwnerDto(owner.getId(), owner.getBirthday(), owner.getCats(), owner.getUser());
     }
 
     @Override

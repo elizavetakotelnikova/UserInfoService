@@ -1,7 +1,7 @@
 package com.example.outermicroservice.security;
 import com.example.jpa.*;
 import com.example.outermicroservice.owner.dto.FindCriteria;
-import com.example.jpa.OwnerMessagingDto;
+import com.example.jpa.OwnerDto;
 import com.example.outermicroservice.user.services.UsersDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -42,8 +42,8 @@ public class UserIdentitySecurityChecker {
         }
         CustomUser details = (CustomUser) auth.getPrincipal();
         var user = usersDao.findById(details.getId()).get();
-        var owner = (OwnerMessagingDto) rabbitTemplate.convertSendAndReceive(RabbitMQConfig.ROUTING_KEY_FINDING_OWNER, ownerId);
-        if (owner == null) return false;
+        var owner = (OwnerDto) rabbitTemplate.convertSendAndReceive(RabbitMQConfig.WEB_EXCHANGE, RabbitMQConfig.ROUTING_KEY_FINDING_OWNER, ownerId);
+        if (owner == null) throw new AccessDeniedException("Access denied");
         if (!Objects.equals(user.getId(), owner.getUser().getId())) {
             throw new AccessDeniedException("Access denied");
         }
@@ -73,7 +73,7 @@ public class UserIdentitySecurityChecker {
         CustomUser details = (CustomUser) auth.getPrincipal();
         User user = usersDao.findById(details.getId()).get();
         var findCriteria = new FindCriteria(null, user);
-        var owner = (OwnerMessagingDto) rabbitTemplate.convertSendAndReceive(RabbitMQConfig.ROUTING_KEY_FINDING_OWNER_BY_CRITERIA, findCriteria);
+        var owner = (OwnerDto) rabbitTemplate.convertSendAndReceive(RabbitMQConfig.WEB_EXCHANGE, RabbitMQConfig.ROUTING_KEY_FINDING_OWNER_BY_CRITERIA, findCriteria);
         if (owner == null || !Objects.equals(cat.getOwner().getId(), owner.getId())) {
             throw new AccessDeniedException("Access denied");
         }
